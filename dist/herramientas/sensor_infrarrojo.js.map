@@ -1,1 +1,0 @@
-{"version":3,"file":"sensor_infrarrojo.js","sourceRoot":"","sources":["../../src/herramientas/sensor_infrarrojo.ts"],"names":[],"mappings":";;;AAAA,+CAA4C;AAE5C,MAAa,gBAAiB,SAAQ,yBAAW;IAE7C;QACI,MAAM,MAAM,GAAG,mBAAmB,CAAC;QACnC,MAAM,IAAI,GAAG,GAAG,CAAC;QACjB,KAAK,CAAC,MAAM,EAAE,IAAI,CAAC,CAAC;IACxB,CAAC;CAEJ;AARD,4CAQC"}
