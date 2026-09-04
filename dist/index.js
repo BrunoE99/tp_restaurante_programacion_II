@@ -1,0 +1,26 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const dron_1 = require("./dron");
+const brazoRobotico_1 = require("./herramientas/brazoRobotico");
+const camaraVigilancia_1 = require("./herramientas/camaraVigilancia");
+const sensor_infrarrojo_1 = require("./herramientas/sensor_infrarrojo");
+const taser_1 = require("./herramientas/taser");
+const camara = new camaraVigilancia_1.CamaraVigilancia();
+const sensorI = new sensor_infrarrojo_1.SensorInfrarrojo();
+const dron = new dron_1.Dron(sensorI, camara);
+console.log(`Herramienta: ${dron.getHerramienta()}`);
+console.log(`Altura: ${dron.getAltura()}`);
+console.log(`Velocidad: ${dron.getVelocidad()}`);
+console.log("#############################################################");
+const taser = new taser_1.Taser();
+dron.setHerramienta(taser);
+console.log(`Herramienta: ${dron.getHerramienta()}`);
+console.log(`Altura: ${dron.getAltura()}`);
+console.log(`Velocidad: ${dron.getVelocidad()}`);
+console.log("#############################################################");
+const brazo = new brazoRobotico_1.BrazoRobotico();
+dron.setHerramienta(brazo);
+console.log(`Herramienta: ${dron.getHerramienta()}`);
+console.log(`Altura: ${dron.getAltura()}`);
+console.log(`Velocidad: ${dron.getVelocidad()}`);
+//# sourceMappingURL=index.js.map
