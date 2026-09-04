@@ -1,0 +1,107 @@
+@startuml Trabajo practico
+
+skinparam classAttributeIconSize 0
+abstract class Pedido {
+    - numeroDePedido
+    - cliente: Cliente
+    - items: Item
+    - combos: Combo
+    - precioTotal
+    - medioDePago
+    - estadoDelPedido
+
+    + abstract pedir()
+    + abstract entregar() 
+        'mover al mozo o cadete
+    + consultarHistorial()
+}
+
+class PedidoSalon {
+    - mozo: Mozo
+    - numeroDeMesa
+}
+
+class PedidoRetiro {
+    - horarioDeRetiro
+    - numeroDeTelefono
+}
+
+class PedidoEnvio {
+    - direccionDeEntrega
+    - costoDeEnvio
+    - cadete: Cadte
+    - barrio
+}
+
+class Cliente {
+    - mesaAsignada
+
+    + pagarPedido()
+    + pedirPedido()
+}
+
+abstract class Empleado {
+    - clientes: Cliente
+    - pedidos: Pedido
+
+    + cobrarPedido()
+}
+
+class Mozo {
+
+    + agregarItem()
+    + modificarPedido()
+    + confirmarPedido()
+}
+
+class Cadete {
+
+}
+
+class Item {
+    - estacion: Estacion
+    - estadoDelItem
+}
+
+abstract class Estacion {
+    - pedidos: Pedido
+
+    + preparandoItem()
+    + itemFinalizado()
+}
+
+class Parrilla {
+
+}
+
+class CocinaFria {
+    
+}
+
+class Barra {
+    
+}
+
+class CocinaDulce {
+    
+}
+
+'relaciones
+
+Pedido <|-- PedidoSalon
+Pedido <|-- PedidoRetiro
+Pedido <|-- PedidoEnvio
+
+Empleado <|-- Mozo
+Empleado <|-- Cadete
+
+Estacion <|-- Parrilla
+Estacion <|-- CocinaFria
+Estacion <|-- Barra
+Estacion <|-- CocinaDulce
+
+'dudas
+
+'en el orden en que le fue llegando: en estacion o en pedido
+
+@enduml
