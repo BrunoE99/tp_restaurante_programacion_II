@@ -1,6 +1,30 @@
 @startuml Trabajo practico
 
 skinparam classAttributeIconSize 0
+
+enum ESTADO_ITEM {
+    PENDIENTE
+    EN_PREPARACION
+    LISTO
+}
+
+enum MEDIO_DE_PAGO {
+    EFECTIVO
+    TARJETA_DEBITO
+    TARJETA_CREDITO
+    BILLETERA_VIRTUAL
+}
+
+enum DIA_SEMANA {
+    LUNES
+    MARTES 
+    MIERCOLES
+    JUEVES
+    VIERNES
+    SABADO 
+    DOMINGO
+}
+
 abstract class Pedido {
     - numeroDePedido
     - cliente: Cliente
