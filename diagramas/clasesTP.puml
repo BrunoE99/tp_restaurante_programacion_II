@@ -25,29 +25,55 @@ enum DIA_SEMANA {
     DOMINGO
 }
 
+enum TIPO_ESTACION {
+    PARRILLA
+    COCINA_FRIA
+    BARRA
+    COCINA_DULCE
+}
+
+class GestorPedidos {
+    - pedido: Pedido
+    - historialDePedidos: Pedido
+
+    + pedidoPago()
+    + consultarHistorial()
+    + agregarItem()
+    + agregarCombo()
+    + eliminarItem()
+    + eliminarCombo()
+    + modificarPedido()
+    + confirmarPedido()
+    + asignarAEstaciones()
+    + calcularPrecioTotal()
+}
+
 abstract class Pedido {
     - numeroDePedido
     - cliente: Cliente
     - items: Item
     - combos: Combo
     - precioTotal
-    - medioDePago
+    - medioDePago: MediosDePago
     - estadoDelPedido
+    - diaActual: DIA_SEMANA
 
     + abstract pedir()
     + abstract entregar() 
         'mover al mozo o cadete
-    + consultarHistorial()
+    + estadoItems()
 }
 
 class PedidoSalon {
     - mozo: Mozo
     - numeroDeMesa
+    - pedidoMesaCerrada
 }
 
 class PedidoRetiro {
     - horarioDeRetiro
     - numeroDeTelefono
+    - pedidoRetirado
 }
 
 class PedidoEnvio {
@@ -55,6 +81,36 @@ class PedidoEnvio {
     - costoDeEnvio
     - cadete: Cadte
     - barrio
+    - pedidoEntregado
+}
+
+interface MediosDePago {
+    + pagoCompletado()
+}
+
+abstract class Tarjeta {
+    - medioDePago: MediosDePago
+    - numeroTarjeta
+    - nombreTitular
+    - codigoSeguridad
+    - fechaVencimiento
+    - saldo
+}
+
+class TarjetaCredito {
+
+}
+
+class TarjetaDebito {
+
+}
+
+class Efectivo {
+
+}
+
+class BilleteraVirtual {
+
 }
 
 class Cliente {
@@ -72,23 +128,55 @@ abstract class Empleado {
 }
 
 class Mozo {
-
-    + agregarItem()
-    + modificarPedido()
-    + confirmarPedido()
+    - gestorDePedido: GestorPedidos
 }
 
 class Cadete {
 
 }
 
+Class Menu {
+    - combos: Combo
+    - items: Item
+}
+
+class Combo {
+    - items: Item
+    - precioCombo
+    - beneficios: Beneficio
+}
+
 class Item {
     - estacion: Estacion
     - estadoDelItem
+    - precioIndividual
 }
 
+interface Beneficio {
+    + calcularBeneficio()
+}
+
+class BeneficioPorPorcentaje {
+
+}
+
+class BeneficioPorPrecioFijo {
+
+}
+
+class DescuentoPorPagoEfectivo {
+    - porcentajeAplicado
+}
+
+class DescuentoPorDiaDeSemana {
+    - diasQueAplica
+    - porcentajeAplicado
+    - precioAplicado
+}
+
+
 abstract class Estacion {
-    - pedidos: Pedido
+    - items: Item
 
     + preparandoItem()
     + itemFinalizado()
@@ -112,20 +200,42 @@ class CocinaDulce {
 
 'relaciones
 
-Pedido <|-- PedidoSalon
-Pedido <|-- PedidoRetiro
+Pedido <|-l- PedidoSalon
+Pedido <|-r- PedidoRetiro
 Pedido <|-- PedidoEnvio
 
 Empleado <|-- Mozo
 Empleado <|-- Cadete
 
-Estacion <|-- Parrilla
+Estacion <|-r- Parrilla
 Estacion <|-- CocinaFria
-Estacion <|-- Barra
+Estacion <|-u- Barra
 Estacion <|-- CocinaDulce
+
+Menu *-- Item
+Menu *-- Combo
+
+Beneficio <|.. BeneficioPorPorcentaje
+Beneficio <|.. BeneficioPorPrecioFijo
+Beneficio <|.. DescuentoPorDiaDeSemana
+Beneficio <|.r. DescuentoPorPagoEfectivo
+'BeneficioPorPorcentaje <|-- DescuentoPorPagoEfectivo
+
+Tarjeta <|-- TarjetaCredito
+Tarjeta <|-- TarjetaDebito
+Tarjeta <|.u. MediosDePago
+
+Efectivo <|.. MediosDePago
+BilleteraVirtual <|.. MediosDePago
 
 'dudas
 
 'en el orden en que le fue llegando: en estacion o en pedido
+'tenemos muchos enums? (enum de tipo beneficio)
+'que es un "descuento especial" los dias de semana
+'datos de tarjeta estan de mas
+'si la interfaz se puede usar como tipo de dato (MediosDePago)
+'interfaz de MediosDePago estaria bien o no es necesaria/deberia ser clase
+'unificamos agregar/eliminarItem/Combo() a un tipo Producto
 
 @enduml
