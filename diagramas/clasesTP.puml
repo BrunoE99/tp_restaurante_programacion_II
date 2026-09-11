@@ -231,11 +231,11 @@ BilleteraVirtual <|.. MediosDePago
 'dudas
 
 'en el orden en que le fue llegando: en estacion o en pedido
-'tenemos muchos enums? (enum de tipo beneficio)
-'que es un "descuento especial" los dias de semana
-'datos de tarjeta estan de mas
-'si la interfaz se puede usar como tipo de dato (MediosDePago)
-'interfaz de MediosDePago estaria bien o no es necesaria/deberia ser clase
-'unificamos agregar/eliminarItem/Combo() a un tipo Producto
+'tenemos muchos enums? (enum de tipo beneficio) -> no confundirnos TIPO DE DATO con ENUMs - validar si tiene sentido tener ENUM y CLASES (caso de metodos de pago)
+'que es un "descuento especial" los dias de semana -> nos podemos tomar la libertad de definirlo como queramos
+'datos de tarjeta estan de mas -> puede ser, analizar si es realmente necesario
+'si la interfaz se puede usar como tipo de dato (MediosDePago) -> si, es un tipo de dato (como clase abstracta)
+'interfaz de MediosDePago estaria bien o no es necesaria/deberia ser clase -> depende de nuestra solucion
+'unificamos agregar/eliminarItem/Combo() a un tipo Producto -> depende de nuestra solucion
 
 @enduml
