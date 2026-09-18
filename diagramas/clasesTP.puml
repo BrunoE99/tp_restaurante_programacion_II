@@ -51,8 +51,8 @@ class GestorPedidos {
 abstract class Pedido {
     - numeroDePedido
     - cliente: Cliente
-    - items: Item
-    - combos: Combo
+    - items: Item[]
+    - combos: Combo[]
     - precioTotal
     - medioDePago: MediosDePago
     - estadoDelPedido
@@ -141,7 +141,7 @@ Class Menu {
 }
 
 class Combo {
-    - items: Item
+    - items: Item[]
     - precioCombo
     - beneficios: Beneficio
 }
@@ -214,6 +214,7 @@ Estacion <|-- CocinaDulce
 
 Menu *-- Item
 Menu *-- Combo
+Combo *-r- Item
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
