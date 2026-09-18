@@ -6,18 +6,18 @@ export abstract class Pedido {
     private combos: Combo[];
     private precioTotal: number;
     private medioDePago: MediosDePago;
-    private estadoDelPedido: ESTADO_ITEM;
-    private diaActual: DIA_SEMANA;
+    // private estadoDelPedido: ESTADO_ITEM;
+    // private diaActual: DIA_SEMANA;
 
-    public constructor(private cliente: Cliente, private mediosDePago: MediosDePago) {
+    public constructor(private cliente: Cliente, private mediosDePago?: MediosDePago) {
         this.numeroDePedido = 0;
         this.cliente = cliente;
         this.items = [];
         this.combos = [];
         this.precioTotal = 0;
-        this.medioDePago = mediosDePago;
-        this.estadoDelPedido = "BORRADOR";
-        this.diaActual = ;
+        this.medioDePago = mediosDePago || undefined;
+        // this.estadoDelPedido = "BORRADOR";
+        // this.diaActual = ;
     }
 
     private setNumeroDePedido(numero: number): void {
@@ -28,8 +28,16 @@ export abstract class Pedido {
         return this.numeroDePedido;
     }
 
-    abstract pedir(): void;
+    public getMedioDePago(): MediosDePago {
+        return this.medioDePago;
+    }
 
-    abstract entregar(): void;
+    public setMedioDePago(medioPago: mediosDePago): void {
+        this.medioDePago = medioPago;
+    }
+
+    protected abstract pedir(): void;
+
+    protected abstract entregar(): void;
 
 }
