@@ -34,7 +34,7 @@ enum TIPO_ESTACION {
 
 class GestorPedidos {
     - pedido: Pedido
-    - historialDePedidos: Pedido
+    - historialDePedidos: Pedido[]
 
     + pedidoPago()
     + consultarHistorial()
