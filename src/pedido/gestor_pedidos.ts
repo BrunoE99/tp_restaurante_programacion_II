@@ -7,6 +7,7 @@ export class GestorPedidos {
 
     public constructor(private pedid: Pedido) {
         this.pedido = pedid;
+        this.historialDePedidos = new Map<number, Pedido>();
     }
 
     public getPedido(): Pedido {

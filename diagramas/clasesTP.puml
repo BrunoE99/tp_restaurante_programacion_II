@@ -24,13 +24,13 @@ enum MEDIO_DE_PAGO {
 }
 
 enum DIA_SEMANA {
+    DOMINGO
     LUNES
     MARTES 
     MIERCOLES
     JUEVES
     VIERNES
     SABADO 
-    DOMINGO
 }
 
 enum TIPO_ESTACION {

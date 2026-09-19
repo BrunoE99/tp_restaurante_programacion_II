@@ -1,4 +1,5 @@
 import { DIA_SEMANA } from "../enums/dia_semana"
+import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
 
 export abstract class Pedido { 
@@ -21,14 +22,14 @@ export abstract class Pedido {
         this.precioTotal = 0;
         this.medioDePago = mediosDePago ?? undefined;
         this.estadoDelPedido = estadoPed ?? ESTADO_PEDIDO.EN_CONSTRUCCION;
-        this.diaActual = diaSem ?? this.getDiaActual();
+        this.diaActual = diaSem ?? this.calculoDiaActual();
     }
 
-    private setNumeroDePedido(numero: number): void {
+    protected setNumeroDePedido(numero: number): void {
         this.numeroDePedido = numero;
     }
 
-    private getnumeroDePedido(): number {
+    public getNumeroDePedido(): number {
         return this.numeroDePedido;
     }
 
@@ -40,7 +41,11 @@ export abstract class Pedido {
         this.medioDePago = medioPago;
     }
 
-    private getDiaActual(): DIA_SEMANA {
+    public getEstadoPedido(): ESTADO_PEDIDO {
+        return this.estadoDelPedido;
+    }
+
+    private calculoDiaActual(): DIA_SEMANA {
         const fecha = new Date();
         const numeroDia = fecha.getDay();
         return numeroDia;
