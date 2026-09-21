@@ -8,7 +8,7 @@ export class BeneficioPorPrecioFijo implements Beneficio {
         this.precioFijo = precioFijo;
     }
 
-    public calcularBeneficio(): number {
+    public calcularBeneficio(sumaDeProductos: number): number {
         return this.precioFijo;
     }
 
