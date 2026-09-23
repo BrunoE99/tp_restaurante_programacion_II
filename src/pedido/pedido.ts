@@ -24,6 +24,10 @@ export abstract class Pedido {
         this.estadoDelPedido = estadoPed ?? ESTADO_PEDIDO.EN_CONSTRUCCION;
         this.diaActual = diaSem ?? this.calculoDiaActual();
     }
+    
+    protected abstract pedir(): void;
+
+    protected abstract entregar(): void;
 
     protected setNumeroDePedido(numero: number): void {
         this.numeroDePedido = numero;
@@ -58,36 +62,59 @@ export abstract class Pedido {
         const numeroDia = fecha.getDay();
         return numeroDia;
     }
-
-    protected abstract pedir(): void;
-
-    protected abstract entregar(): void;
-
+    
     public estadoItems(): ESTADO_ITEM {
-        // verificar lista enlazada de Items/Combos para verificar el estado
-        return ESTADO_ITEM.EN_PREPARACION;
+
+        if (this.items.length === 0 && this.combos.length === 0) {
+            return ESTADO_ITEM.PENDIENTE;
+        }
+
+        const estadosItems = this.items.map(item => item.getEstadoItem());
+        const estadosCombos = this.combos.map(combo => combo.getEstadoCombo());
+
+        return Math.min(...estadosItems, ...estadosCombos) as ESTADO_ITEM;
     }
 
     public agregarItem(item: Item): void {
         this.items.push(item);
+        this.calcularPrecio();
     }
 
     public eliminarItem(item: Item): void {
         const posicion: number = this.items.findIndex((itemArray) => itemArray === item);
+
         if (posicion >= 0) {
             this.items.splice(posicion, 1);
         }
+
+        this.calcularPrecio();
     }
 
     public agregarCombo(combo: Combo): void {
         this.combos.push(combo);
+        this.calcularPrecio();
     }
 
     public eliminarCombo(combo: Combo): void {
         const posicion: number = this.combos.findIndex((comboArray) => comboArray === combo);
+
         if (posicion >= 0) {
             this.combos.splice(posicion, 1);
-        } 
+        }
+
+        this.calcularPrecio();
+    }
+
+    protected calcularPrecio(): void {
+        const valorInicialItems = 0;
+        const precioItems: number = this.items.reduce((acumulador, valorAct) => acumulador + 
+        valorAct.getPrecioIndividual(), valorInicialItems);
+
+        const valorInicialCombos = 0;
+        const precioCombos: number = this.combos.reduce((acumulador, valorAct) => acumulador + 
+        valorAct.getPrecioCombo(), valorInicialCombos);
+
+        this.precioTotal = precioItems + precioCombos;
     }
 
 }

@@ -24,8 +24,8 @@ export class GestorPedidos {
     }
 
     public consultarHistorial(numPedido: number): void {
-        this.historialDePedidos.forEach((value, key) => {
-            console.log(`Pedido nro: ${key}`)
+        this.historialDePedidos.forEach((valor, llave) => {
+            console.log(`Pedido nro: ${llave}`)
         })
     }
 
@@ -50,18 +50,13 @@ export class GestorPedidos {
     }
 
     public confirmarPedido(): void {
-        this.pedido.setEstadoPedido(ESTADO_PEDIDO.EN_PREPARACION);
+        this.pedido.setEstadoPedido(ESTADO_PEDIDO.PENDIENTE);
         // deberia agregarse al finalizarse? al pagarse?
         this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
     }
 
     public asignarAEstaciones(): void {
         // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
-        // llama a pedir() de Pedido?
-    }
-
-    public calcularPrecioTotal(): number {
-        // calcula el precio con todos los items+combos y suma los descuentos?
     }
 
 }
