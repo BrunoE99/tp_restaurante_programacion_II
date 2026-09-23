@@ -15,9 +15,10 @@ export class DescuentoPorDiaDeSemana implements Descuento {
     }
 
     public calcularDescuento(pedido: Pedido): number {
-        // falta getter publico de diaActual en Pedido (Bruno)
+        if (pedido.getDiaActual() !== this.diaQueAplica) {
+            return 0;
+        }
         // falta calcularPrecioTotal() en Pedido (Bruno)
         return 0;
     }
-
 }
