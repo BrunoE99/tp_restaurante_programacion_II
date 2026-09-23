@@ -6,8 +6,8 @@ export abstract class Pedido {
 
     private numeroDePedido: number;
     private cliente: Cliente;
-    private items: Item[]; // lista enlazada
-    private combos: Combo[]; // lista enlazada
+    private items: Item[];
+    private combos: Combo[];
     private precioTotal: number;
     private medioDePago: MediosDePago;
     private estadoDelPedido: ESTADO_PEDIDO;
@@ -49,6 +49,10 @@ export abstract class Pedido {
         this.estadoDelPedido = estado;
     }
 
+    public getDiaActual(): DIA_SEMANA {
+        return this.diaActual;
+    }
+
     private calculoDiaActual(): DIA_SEMANA {
         const fecha = new Date();
         const numeroDia = fecha.getDay();
@@ -65,21 +69,25 @@ export abstract class Pedido {
     }
 
     public agregarItem(item: Item): void {
-        // tiene que cambiarse a lista enlazada
         this.items.push(item);
     }
 
     public eliminarItem(item: Item): void {
-        // eliminar de la lista
+        const posicion: number = this.items.findIndex((itemArray) => itemArray === item);
+        if (posicion >= 0) {
+            this.items.splice(posicion, 1);
+        }
     }
 
     public agregarCombo(combo: Combo): void {
-        // tiene que cambiarse a lista enlazada
         this.combos.push(combo);
     }
 
     public eliminarCombo(combo: Combo): void {
-        // eliminar de la lista
+        const posicion: number = this.combos.findIndex((comboArray) => comboArray === combo);
+        if (posicion >= 0) {
+            this.combos.splice(posicion, 1);
+        } 
     }
 
 }

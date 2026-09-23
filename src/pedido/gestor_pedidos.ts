@@ -24,7 +24,9 @@ export class GestorPedidos {
     }
 
     public consultarHistorial(numPedido: number): void {
-        // usar la funcion del MAP para validar el Pedido
+        this.historialDePedidos.forEach((value, key) => {
+            console.log(`Pedido nro: ${key}`)
+        })
     }
 
     public agregarItem(item: Item): void {
@@ -49,10 +51,13 @@ export class GestorPedidos {
 
     public confirmarPedido(): void {
         this.pedido.setEstadoPedido(ESTADO_PEDIDO.EN_PREPARACION);
+        // deberia agregarse al finalizarse? al pagarse?
+        this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
     }
 
     public asignarAEstaciones(): void {
         // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
+        // llama a pedir() de Pedido?
     }
 
     public calcularPrecioTotal(): number {
