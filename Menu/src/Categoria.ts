@@ -1,0 +1,6 @@
+export enum CATEGORIA {
+  ENTRADA,
+  PLATO_PRINCIPAL,
+  BEBIDA,
+  POSTRE
+}
