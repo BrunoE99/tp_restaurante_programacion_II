@@ -52,6 +52,10 @@ export abstract class Pedido {
     public getDiaActual(): DIA_SEMANA {
         return this.diaActual;
     }
+
+    public getPrecioTotal(): number {
+        return this.precioTotal;
+    }
     
     public estadoItems(): ESTADO_ITEM {
 
