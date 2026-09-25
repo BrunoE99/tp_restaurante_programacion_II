@@ -14,14 +14,14 @@ export abstract class Pedido {
     private estadoDelPedido: ESTADO_PEDIDO;
     private diaActual: DIA_SEMANA;
 
-    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago, estadoPed?: ESTADO_PEDIDO) {
+    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago) {
         this.numeroDePedido = 0;
         this.cliente = client;
         this.items = [];
         this.combos = [];
         this.precioTotal = 0;
         this.medioDePago = mediosDePago;
-        this.estadoDelPedido = estadoPed ?? ESTADO_PEDIDO.EN_CONSTRUCCION;
+        this.estadoDelPedido = ESTADO_PEDIDO.EN_CONSTRUCCION;
         this.diaActual = diaSem.calculoDia();
     }
     
@@ -49,10 +49,6 @@ export abstract class Pedido {
         return this.estadoDelPedido;
     }
 
-    public setEstadoPedido(estado: ESTADO_PEDIDO): void {
-        this.estadoDelPedido = estado;
-    }
-
     public getDiaActual(): DIA_SEMANA {
         return this.diaActual;
     }
@@ -70,11 +66,13 @@ export abstract class Pedido {
     }
 
     public agregarItem(item: Item): void {
+        this.validarPedidoEnConstruccion();
         this.items.push(item);
         this.calcularPrecio();
     }
 
     public eliminarItem(item: Item): void {
+        this.validarPedidoEnConstruccion();
         const posicion: number = this.items.findIndex((itemArray) => itemArray === item);
 
         if (posicion >= 0) {
@@ -85,11 +83,13 @@ export abstract class Pedido {
     }
 
     public agregarCombo(combo: Combo): void {
+        this.validarPedidoEnConstruccion();
         this.combos.push(combo);
         this.calcularPrecio();
     }
 
     public eliminarCombo(combo: Combo): void {
+        this.validarPedidoEnConstruccion();
         const posicion: number = this.combos.findIndex((comboArray) => comboArray === combo);
 
         if (posicion >= 0) {
@@ -109,6 +109,35 @@ export abstract class Pedido {
         valorAct.getPrecioCombo(), valorInicialCombos);
 
         this.precioTotal = precioItems + precioCombos;
+    }
+
+    public confirmarPedido(): void {
+        this.validarPedidoEnConstruccion();
+        if (this.items.length === 0 && this.combos.length === 0) {
+            throw new Error("El pedido no tiene items ni combos a confirmar");
+        }
+
+        this.estadoDelPedido = ESTADO_PEDIDO.CONFIRMADO;
+    }
+
+    private validarPedidoEnConstruccion(): void {
+        if (this.estadoDelPedido !== ESTADO_PEDIDO.EN_CONSTRUCCION) {
+            throw new Error("El pedido no esta en construccion");
+        }
+    }
+
+    public facturarPedido(): void {
+        if (this.estadoDelPedido !== ESTADO_PEDIDO.CONFIRMADO) {
+            throw new Error("El pedido no se encuentra confirmado.");
+        }
+        if (this.estadoItems() !== ESTADO_ITEM.LISTO) {
+            throw new Error("Los items y/o combos no estan listos.")
+        }
+        if (this.medioDePago === undefined) {
+            throw new Error("No existe el medio de pago");
+        }
+
+        this.estadoDelPedido = ESTADO_PEDIDO.FACTURADO;
     }
 
 }

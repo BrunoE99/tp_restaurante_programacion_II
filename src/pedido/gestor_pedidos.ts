@@ -1,4 +1,3 @@
-import { ESTADO_PEDIDO } from "../enums/estado_pedido";
 import { Pedido } from "./pedido";
 
 export class GestorPedidos {
@@ -25,10 +24,20 @@ export class GestorPedidos {
         this.pedido.setMedioDePago(medioPago);
     }
 
-    public consultarHistorial(numPedido: number): void {
-        this.historialDePedidos.forEach((valor, llave) => {
-            console.log(`Pedido nro: ${llave}`)
-        })
+    public getHistorial(): Pedido[] {
+        const pedidosCompleto: Pedido[] = Array.from(this.historialDePedidos.values());
+
+        return pedidosCompleto;
+    }
+
+    public consultarHistorialPedido(numPedido: number): Pedido {
+        const pedidoConsultado = this.historialDePedidos.get(numPedido);
+
+        if (pedidoConsultado === undefined) {
+            throw new Error("No existe el pedido");
+        }
+
+        return pedidoConsultado;
     }
 
     public agregarItem(item: Item): void {
@@ -47,17 +56,17 @@ export class GestorPedidos {
         this.pedido.eliminarCombo(combo);
     }
 
-    // public modificarPedido(): void {
-    //     // que debia hacer esto?
-    // }
-
     public confirmarPedido(): void {
-        this.pedido.setEstadoPedido(ESTADO_PEDIDO.PENDIENTE);
-        // deberia agregarse al finalizarse? al pagarse?
+        this.pedido.confirmarPedido();
+        this.asignarAEstaciones();
+    }
+
+    public facturarPedido(): void {
+        this.pedido.facturarPedido();
         this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
     }
 
-    public asignarAEstaciones(): void {
+    private asignarAEstaciones(): void {
         // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
     }
 

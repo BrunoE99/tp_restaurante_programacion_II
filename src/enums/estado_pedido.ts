@@ -1,7 +1,5 @@
 export enum ESTADO_PEDIDO {
     EN_CONSTRUCCION,
-    PENDIENTE,
-    EN_PREPARACION,
-    LISTO,
-    PAGO
+    CONFIRMADO,
+    FACTURADO
 }
