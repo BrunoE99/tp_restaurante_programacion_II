@@ -5,10 +5,12 @@ export class GestorPedidos {
 
     private pedido: Pedido;
     private historialDePedidos: Map<number, Pedido>;
+    private estaciones: Estacion[];
 
-    public constructor(private pedid: Pedido) {
+    public constructor(pedid: Pedido, estacionesParam: Estacion[]) {
         this.pedido = pedid;
         this.historialDePedidos = new Map<number, Pedido>();
+        this.estaciones = estacionesParam;
     }
 
     public getPedido(): Pedido {
@@ -19,7 +21,7 @@ export class GestorPedidos {
         this.pedido = pedid;
     }
 
-    public pedidoPago(medioPago: mediosDePago): void {
+    public pedidoPago(medioPago: MediosDePago): void {
         this.pedido.setMedioDePago(medioPago);
     }
 
@@ -45,9 +47,9 @@ export class GestorPedidos {
         this.pedido.eliminarCombo(combo);
     }
 
-    public modificarPedido(): void {
-        // que debia hacer esto?
-    }
+    // public modificarPedido(): void {
+    //     // que debia hacer esto?
+    // }
 
     public confirmarPedido(): void {
         this.pedido.setEstadoPedido(ESTADO_PEDIDO.PENDIENTE);

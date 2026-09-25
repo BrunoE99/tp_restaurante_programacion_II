@@ -1,6 +1,7 @@
 import { DIA_SEMANA } from "../enums/dia_semana"
 import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
+import { CalculoDia } from "../calculo_dia/dia_actual"
 
 export abstract class Pedido { 
 
@@ -9,20 +10,19 @@ export abstract class Pedido {
     private items: Item[];
     private combos: Combo[];
     private precioTotal: number;
-    private medioDePago: MediosDePago;
+    private medioDePago: MediosDePago | undefined;
     private estadoDelPedido: ESTADO_PEDIDO;
     private diaActual: DIA_SEMANA;
 
-    public constructor(private client: Cliente, private mediosDePago?: MediosDePago, 
-        estadoPed?: ESTADO_PEDIDO, diaSem?: DIA_SEMANA) {
+    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago, estadoPed?: ESTADO_PEDIDO) {
         this.numeroDePedido = 0;
         this.cliente = client;
         this.items = [];
         this.combos = [];
         this.precioTotal = 0;
-        this.medioDePago = mediosDePago ?? undefined;
+        this.medioDePago = mediosDePago;
         this.estadoDelPedido = estadoPed ?? ESTADO_PEDIDO.EN_CONSTRUCCION;
-        this.diaActual = diaSem ?? this.calculoDiaActual();
+        this.diaActual = diaSem.calculoDia();
     }
     
     protected abstract pedir(): void;
@@ -37,11 +37,11 @@ export abstract class Pedido {
         return this.numeroDePedido;
     }
 
-    public getMedioDePago(): MediosDePago {
+    public getMedioDePago(): MediosDePago | undefined {
         return this.medioDePago;
     }
 
-    public setMedioDePago(medioPago: mediosDePago): void {
+    public setMedioDePago(medioPago: MediosDePago): void {
         this.medioDePago = medioPago;
     }
 
@@ -55,12 +55,6 @@ export abstract class Pedido {
 
     public getDiaActual(): DIA_SEMANA {
         return this.diaActual;
-    }
-
-    private calculoDiaActual(): DIA_SEMANA {
-        const fecha = new Date();
-        const numeroDia = fecha.getDay();
-        return numeroDia;
     }
     
     public estadoItems(): ESTADO_ITEM {

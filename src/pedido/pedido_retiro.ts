@@ -1,6 +1,6 @@
 import { Pedido } from "./pedido";
-import { DIA_SEMANA } from "../enums/dia_semana"
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
+import { CalculoDia } from "../calculo_dia/dia_actual";
 
 export class PedidoRetiro extends Pedido {
     
@@ -8,10 +8,9 @@ export class PedidoRetiro extends Pedido {
     private numeroDeTelefono: number;
     private pedidoRetirado: boolean;
 
-    public constructor(cliente: Cliente, mediosDePago?: MediosDePago,
-        estadoPed?: ESTADO_PEDIDO, diaSem?: DIA_SEMANA
-    ) {
-        super(cliente, mediosDePago, estadoPed, diaSem);
+    public constructor(cliente: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago,
+        estadoPed?: ESTADO_PEDIDO) {
+        super(cliente, diaSem, mediosDePago, estadoPed);
         this.horarioDeRetiro = 0;
         this.numeroDeTelefono = 0;
         this.pedidoRetirado = false;

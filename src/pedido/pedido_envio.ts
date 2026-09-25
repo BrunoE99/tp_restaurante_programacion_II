@@ -1,6 +1,6 @@
 import { Pedido } from "./pedido";
-import { DIA_SEMANA } from "../enums/dia_semana"
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
+import { CalculoDia } from "../calculo_dia/dia_actual";
 
 export class PedidoEnvio extends Pedido {
     
@@ -10,9 +10,9 @@ export class PedidoEnvio extends Pedido {
     private barrio: string;
     private pedidoEntregado: boolean;
 
-    public constructor(direccion: string, private cadet: Cadete, cliente: Cliente, 
-        mediosDePago?: MediosDePago, estadoPed?: ESTADO_PEDIDO, diaSem?: DIA_SEMANA) {
-        super(cliente, mediosDePago, estadoPed, diaSem);
+    public constructor(direccion: string, cadet: Cadete, cliente: Cliente, diaSem: CalculoDia,
+        mediosDePago?: MediosDePago, estadoPed?: ESTADO_PEDIDO) {
+        super(cliente, diaSem, mediosDePago, estadoPed);
         this.direccionDeEntrega = direccion;
         this.costoDeEnvio = 0;
         this.cadete = cadet;
