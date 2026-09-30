@@ -66,7 +66,7 @@ export class GestorPedidos {
         this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
     }
 
-    private asignarAEstaciones(): void {
+    public asignarAEstaciones(): void {
         // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
     }
 
