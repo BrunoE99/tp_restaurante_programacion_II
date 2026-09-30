@@ -8,6 +8,12 @@ enum ESTADO_ITEM {
     LISTO
 }
 
+enum ESTADO_PEDIDO {
+    EN_CONSTRUCCION
+    CONFIRMADO
+    FACTURADO
+}
+
 enum MEDIO_DE_PAGO {
     EFECTIVO
     TARJETA_DEBITO
@@ -16,13 +22,13 @@ enum MEDIO_DE_PAGO {
 }
 
 enum DIA_SEMANA {
+    DOMINGO
     LUNES
     MARTES 
     MIERCOLES
     JUEVES
     VIERNES
     SABADO 
-    DOMINGO
 }
 
 enum TIPO_ESTACION {
@@ -34,54 +40,64 @@ enum TIPO_ESTACION {
 
 class GestorPedidos {
     - pedido: Pedido
-    - historialDePedidos: Pedido
+    - historialDePedidos: Map<number, Pedido>
+    - estaciones: Estacion[]
 
-    + pedidoPago()
-    + consultarHistorial()
+    + pedidoPago(mp: MediosDePago)
+    + getHistorial(): Pedido[]
+    + consultarHistorialPedido(numPedido: number): Pedido
     + agregarItem()
     + agregarCombo()
     + eliminarItem()
     + eliminarCombo()
-    + modificarPedido()
     + confirmarPedido()
     + asignarAEstaciones()
-    + calcularPrecioTotal()
+    + facturarPedido()
 }
 
 abstract class Pedido {
-    - numeroDePedido
+    - numeroDePedido: number
     - cliente: Cliente
-    - items: Item
-    - combos: Combo
-    - precioTotal
-    - medioDePago: MediosDePago
-    - estadoDelPedido
+    - items: Item[]
+    - combos: Combo[]
+    - precioTotal: number
+    - medioDePago: MediosDePago | undefined
+    - estadoDelPedido: ESTADO_PEDIDO
     - diaActual: DIA_SEMANA
 
-    + abstract pedir()
-    + abstract entregar() 
+    # abstract pedir()
+    # abstract entregar() 
         'mover al mozo o cadete
-    + estadoItems()
+    + estadoItems(): ESTADO_ITEM
+    # calcularPrecio()
+    + confirmarPedido()
+    - validarPedidoEnConstruccion()
+    + facturarPedido()
+    + agregarItem(i: Item)
+    + agregarCombo(c: Combo)
+    + eliminarItem(i: Item)
+    + eliminarCombo(c: Combo)
+
 }
 
 class PedidoSalon {
     - mozo: Mozo
-    - numeroDeMesa
-    - pedidoMesaCerrada
+    - numeroDeMesa: number
+    - pedidoMesaCerrada: boolean
 }
 
 class PedidoRetiro {
-    - horarioDeRetiro
-    - numeroDeTelefono
-    - pedidoRetirado
+    - horarioDeRetiro: number
+    - numeroDeTelefono: number
+    - pedidoRetirado: boolean
 }
 
 class PedidoEnvio {
-    - direccionDeEntrega
-    - costoDeEnvio
-    - cadete: Cadte
-    - barrio
-    - pedidoEntregado
+    - direccionDeEntrega: string
+    - costoDeEnvio: number
+    - cadete: Cadete
+    - barrio: string
+    - pedidoEntregado: boolean
 }
 
 interface MediosDePago {
@@ -136,12 +152,12 @@ class Cadete {
 }
 
 Class Menu {
-    - combos: Combo
-    - items: Item
+    - combos: Combo[]
+    - items: Item[]
 }
 
 class Combo {
-    - items: Item
+    - items: Item[]
     - precioCombo
     - beneficios: Beneficio
 }
@@ -176,7 +192,7 @@ class DescuentoPorDiaDeSemana {
 
 
 abstract class Estacion {
-    - items: Item
+    - items: Item[]
 
     + preparandoItem()
     + itemFinalizado()
@@ -198,11 +214,25 @@ class CocinaDulce {
     
 }
 
+class CalculoDia {
+    - fecha: Date
+
+    + calculoDia(): DIA_SEMANA
+}
+
 'relaciones
 
 Pedido <|-l- PedidoSalon
 Pedido <|-r- PedidoRetiro
 Pedido <|-- PedidoEnvio
+
+CalculoDia <.. Pedido
+
+GestorPedidos o-- Pedido
+GestorPedidos *-- Estacion
+
+PedidoSalon *-- Mozo
+PedidoEnvio *-- Cadete
 
 Empleado <|-- Mozo
 Empleado <|-- Cadete
@@ -214,6 +244,8 @@ Estacion <|-- CocinaDulce
 
 Menu *-- Item
 Menu *-- Combo
+Combo *-r- Item
+Item o-- Estacion
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
@@ -221,9 +253,9 @@ Beneficio <|.. DescuentoPorDiaDeSemana
 Beneficio <|.r. DescuentoPorPagoEfectivo
 'BeneficioPorPorcentaje <|-- DescuentoPorPagoEfectivo
 
-Tarjeta <|-- TarjetaCredito
-Tarjeta <|-- TarjetaDebito
-Tarjeta <|.u. MediosDePago
+TarjetaCredito <|-- Tarjeta
+TarjetaDebito <|-- Tarjeta
+MediosDePago <|.. Tarjeta
 
 Efectivo <|.. MediosDePago
 BilleteraVirtual <|.. MediosDePago
@@ -237,5 +269,13 @@ BilleteraVirtual <|.. MediosDePago
 'si la interfaz se puede usar como tipo de dato (MediosDePago) -> si, es un tipo de dato (como clase abstracta)
 'interfaz de MediosDePago estaria bien o no es necesaria/deberia ser clase -> depende de nuestra solucion
 'unificamos agregar/eliminarItem/Combo() a un tipo Producto -> depende de nuestra solucion
+
+'pendientes - revisar diagrama
+
+'flechas invertidas: TarjetaCredito/TarjetaDebito con Tarjeta (herencia), Efectivo/BilleteraVirtual con MediosDePago (realizacion)
+'revisar composiciones: PedidoSalon-Mozo, PedidoEnvio-Cadete, GestorPedidos-Estacion (llegan por constructor), Item con 2 duenios (Menu y Combo)
+'decidir que asociaciones dibujar (el atributo tipado ya expresa la relacion) y ordenar layout (package, together, direcciones)
+'visibilidad: GestorPedidos asignarAEstaciones (-)
+'Tarjeta tiene atributo medioDePago y ademas implementa MediosDePago -> redundante?
 
 @enduml
