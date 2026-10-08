@@ -7,9 +7,9 @@ public preparar(item:Item):Item{
     return null;
     } else{   
     item.estado = ESTADO_ITEM.EN_PREPARACION;
-    console.log("item en preparacion en cocina dulce");
+    console.log("item en preparacion en la barra");
     item.estado = ESTADO_ITEM.LISTO;
-    console.log("item listo en cocina dulce");
+    console.log("item listo en la barra");
     return item;
     }
 }
