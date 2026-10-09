@@ -1,0 +1,5 @@
+export enum ESTADO_ITEM {
+    PENDIENTE,
+    EN_PREPARACION,
+    LISTO
+}
