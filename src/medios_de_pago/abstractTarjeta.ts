@@ -1,4 +1,4 @@
-import MediosDePago from './IMediosDePago';
+import MediosDePago from './iMediosDePago';
 export default abstract class AbstractTarjeta implements MediosDePago {
     private medioDePago: MediosDePago;
     private numeroTarjeta: string;

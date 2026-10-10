@@ -1,6 +1,6 @@
-import MediosDePago from './IMediosDePago';
-import AbstractTarjeta from './AbstractTarjeta';
-export default class TarjetaDebito extends AbstractTarjeta {
+import MediosDePago from './iMediosDePago';
+import AbstractTarjeta from './abstractTarjeta';
+export default class TarjetaCredito extends AbstractTarjeta {
     public constructor(
         medioDePago: MediosDePago,
          numeroTarjeta: string,
@@ -13,6 +13,6 @@ export default class TarjetaDebito extends AbstractTarjeta {
     }
 
     public pagoCompletado(): void {
-        console.log('Pago con tarjeta de débito completado con éxito.');
+        console.log('Pago con tarjeta de credito completado con éxito.');
     }
 }
