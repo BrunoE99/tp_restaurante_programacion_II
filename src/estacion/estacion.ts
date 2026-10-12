@@ -1,9 +1,9 @@
-export default abstract class Estacion{
+export default abstract class Estacion {
 
-protected itemValido(item:Item,comparacion:string):boolean{
-    return item.tipo==comparacion;
-}
+    protected itemValido(item: Item, comparacion: string): boolean {
+        return item.tipo == comparacion;
+    }
 
-public abstract preparar(item:Item):Item;
+    public abstract preparar(item: Item): Item;
 
 }
