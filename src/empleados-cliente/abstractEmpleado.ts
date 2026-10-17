@@ -1,8 +1,8 @@
 import Cliente from "./cliente";
-import Pedido from "./Pedido";
+import Pedido from "./pedido";
 import iMedioDePago from "./iMedioDePago";
 
-export default class Empleado {
+export default abstract class Empleado {
     private clientes: Cliente[];
     private pedidos: Pedido[];
 
