@@ -1,3 +1,4 @@
+import Estacion from "../estacion/estacion";
 import { Pedido } from "./pedido";
 
 export class GestorPedidos {
