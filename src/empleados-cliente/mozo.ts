@@ -1,7 +1,7 @@
 import Empleado from "./abstractEmpleado";
 import Cliente from "./cliente";
-import Pedido from "./pedido";
-import GestorDePedidos from "./GestorDePedidos";
+import Pedido from "../pedido/pedido";
+import GestorDePedidos from "../pedido/gestor_pedidos";
 export default class Mozo extends Empleado {
     private gestorDePedidos: GestorDePedidos;
 

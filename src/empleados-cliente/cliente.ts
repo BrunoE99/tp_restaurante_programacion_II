@@ -1,3 +1,4 @@
+import iMedioDePago from "../medios_de_pago/iMediosDePago";
 export default class Cliente {
     private mesaAsignada: number;
 
