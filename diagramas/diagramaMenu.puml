@@ -1,0 +1,49 @@
+@startuml
+
+enum CATEGORIA { 
+  ENTRADA,
+  PLATO_PRINCIPAL,
+  BEBIDA,
+  POSTRE
+}
+
+class Menu {
+  - items: Item[]
+  - combos: Combo[]
+
+  + agregarItem(item: Item): void
+  + eliminarItem(item: Item): void
+  + agregarCombo(combo: Combo): void
+  + eliminarCombo(combo: Combo)
+  + consultarItems(): Item[]
+  + consultarCombos(): Combo[]
+}
+
+class Item {
+  - nombre: string
+  - precio: number
+  - categoria: CATEGORIA
+
+  + getNombre(): string
+  + getPrecio(): number
+  + getCategoria(): CATEGORIA
+
+}
+
+class Combo {
+  - nombre: string 
+  - items: Item[]
+  - precio: number // espera el "Beneficio" (? a revisar)
+
+  + getNombre(): string
+  + getItems(): Item[]
+
+}
+
+' Relaciones
+Menu o-- Item
+Menu o-- Combo
+Combo o-r- Item
+@enduml
+
+' Queda pendiente la integracion con Pedido
