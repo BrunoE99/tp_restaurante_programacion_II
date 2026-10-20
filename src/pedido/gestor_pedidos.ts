@@ -1,3 +1,4 @@
+import IMediosDePago from "../medios_de_pago/iMediosDePago";
 import Estacion from "../estacion/estacion";
 import { Pedido } from "./pedido";
 
@@ -21,7 +22,7 @@ export class GestorPedidos {
         this.pedido = pedid;
     }
 
-    public pedidoPago(medioPago: MediosDePago): void {
+    public pedidoPago(medioPago: IMediosDePago): void {
         this.pedido.setMedioDePago(medioPago);
     }
 
