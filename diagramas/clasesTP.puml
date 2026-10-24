@@ -46,10 +46,8 @@ class GestorPedidos {
     + pedidoPago(mp: MediosDePago)
     + getHistorial(): Pedido[]
     + consultarHistorialPedido(numPedido: number): Pedido
-    + agregarItem()
-    + agregarCombo()
-    + eliminarItem()
-    + eliminarCombo()
+    + agregarProducto(producto: Producto)
+    + eliminarProducto(producto: Producto)
     + confirmarPedido()
     + asignarAEstaciones()
     + facturarPedido()
@@ -58,8 +56,7 @@ class GestorPedidos {
 abstract class Pedido {
     - numeroDePedido: number
     - cliente: Cliente
-    - items: Item[]
-    - combos: Combo[]
+    - productos: Producto[]
     - precioTotal: number
     - medioDePago: MediosDePago | undefined
     - estadoDelPedido: ESTADO_PEDIDO
@@ -73,11 +70,8 @@ abstract class Pedido {
     + confirmarPedido()
     - validarPedidoEnConstruccion()
     + facturarPedido()
-    + agregarItem(i: Item)
-    + agregarCombo(c: Combo)
-    + eliminarItem(i: Item)
-    + eliminarCombo(c: Combo)
-
+    + agregarProducto(producto: Producto)
+    + eliminarProducto(producto: Producto)
 }
 
 class PedidoSalon {
@@ -151,22 +145,26 @@ class Cadete {
 
 }
 
-Class Menu {
-    - combos: Combo[]
-    - items: Item[]
-}
+    Interface Producto {
+        getPrecio(): number
+        getEstadoProducto(): ESTADO_ITEM
+    }
 
-class Combo {
-    - items: Item[]
-    - precioCombo
-    - beneficios: Beneficio
-}
 
-class Item {
-    - estacion: Estacion
-    - estadoDelItem
-    - precioIndividual
-}
+    class Combo implements Producto {
+        - items: Item[]
+        - beneficio: Beneficio
+        - nombre: string
+    }
+
+    class Item implements Producto {
+        - estacion: Estacion
+        - estadoDelItem : ESTADO_ITEM
+        - precioIndividual : number
+        - nombre : string
+
+        + avanzarEstadoItem(): void
+    }
 
 interface Beneficio {
     + calcularBeneficio()
@@ -242,10 +240,8 @@ Estacion <|-- CocinaFria
 Estacion <|-u- Barra
 Estacion <|-- CocinaDulce
 
-Menu *-- Item
-Menu *-- Combo
-Combo *-r- Item
-Item o-- Estacion
+Combo *-- Item
+Pedido *-- Producto
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
