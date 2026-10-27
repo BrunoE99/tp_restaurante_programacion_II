@@ -1,5 +1,8 @@
 import { Pedido } from "./pedido";
 import { CalculoDia } from "../calculo_dia/dia_actual";
+import Cadete from "../empleados-cliente/cadete";
+import Cliente from "../empleados-cliente/cliente";
+import IMediosDePago from "../medios_de_pago/iMediosDePago";
 
 export class PedidoEnvio extends Pedido {
     
@@ -10,7 +13,7 @@ export class PedidoEnvio extends Pedido {
     private pedidoEntregado: boolean;
 
     public constructor(direccion: string, cadet: Cadete, cliente: Cliente, diaSem: CalculoDia,
-    mediosDePago?: MediosDePago) {
+    mediosDePago?: IMediosDePago) {
         super(cliente, diaSem, mediosDePago);
         this.direccionDeEntrega = direccion;
         this.costoDeEnvio = 0;

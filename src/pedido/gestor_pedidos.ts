@@ -1,6 +1,8 @@
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
 import Estacion from "../estacion/estacion";
 import { Pedido } from "./pedido";
+import { Item } from "../menu/item";
+import { Combo } from "../menu/combo";
 
 export class GestorPedidos {
 

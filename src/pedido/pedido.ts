@@ -2,6 +2,10 @@ import { DIA_SEMANA } from "../enums/dia_semana"
 import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
+import Cliente from "../empleados-cliente/cliente";
+import { Item } from "../menu/item";
+import { Combo } from "../menu/combo";
+import IMediosDePago from "../medios_de_pago/iMediosDePago";
 
 export abstract class Pedido { 
 
@@ -10,11 +14,11 @@ export abstract class Pedido {
     private items: Item[];
     private combos: Combo[];
     private precioTotal: number;
-    private medioDePago: MediosDePago | undefined;
+    private medioDePago: IMediosDePago | undefined;
     private estadoDelPedido: ESTADO_PEDIDO;
     private diaActual: DIA_SEMANA;
 
-    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago) {
+    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
         this.numeroDePedido = 0;
         this.cliente = client;
         this.items = [];
@@ -37,11 +41,11 @@ export abstract class Pedido {
         return this.numeroDePedido;
     }
 
-    public getMedioDePago(): MediosDePago | undefined {
+    public getMedioDePago(): IMediosDePago | undefined {
         return this.medioDePago;
     }
 
-    public setMedioDePago(medioPago: MediosDePago): void {
+    public setMedioDePago(medioPago: IMediosDePago): void {
         this.medioDePago = medioPago;
     }
 
