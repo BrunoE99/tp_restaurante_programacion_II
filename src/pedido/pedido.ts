@@ -29,10 +29,6 @@ export abstract class Pedido {
         this.diaActual = diaSem.calculoDia();
     }
     
-    protected abstract pedir(): void;
-
-    protected abstract entregar(): void;
-
     protected setNumeroDePedido(numero: number): void {
         this.numeroDePedido = numero;
     }

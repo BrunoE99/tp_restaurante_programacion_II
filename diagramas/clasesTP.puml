@@ -65,9 +65,8 @@ abstract class Pedido {
     - estadoDelPedido: ESTADO_PEDIDO
     - diaActual: DIA_SEMANA
 
-    # abstract pedir()
-    # abstract entregar() 
-        'mover al mozo o cadete
+    '# abstract pedir()
+    '# abstract entregar() 
     + estadoItems(): ESTADO_ITEM
     # calcularPrecio()
     + confirmarPedido()
@@ -83,13 +82,13 @@ abstract class Pedido {
 class PedidoSalon {
     - mozo: Mozo
     - numeroDeMesa: number
-    - pedidoMesaCerrada: boolean
+    '- pedidoMesaCerrada: boolean
 }
 
 class PedidoRetiro {
     - horarioDeRetiro: number
     - numeroDeTelefono: number
-    - pedidoRetirado: boolean
+    '- pedidoRetirado: boolean
 }
 
 class PedidoEnvio {
@@ -97,7 +96,7 @@ class PedidoEnvio {
     - costoDeEnvio: number
     - cadete: Cadete
     - barrio: string
-    - pedidoEntregado: boolean
+    '- pedidoEntregado: boolean
 }
 
 interface MediosDePago {

@@ -7,13 +7,11 @@ export class PedidoRetiro extends Pedido {
     
     private horarioDeRetiro: number;
     private numeroDeTelefono: number;
-    private pedidoRetirado: boolean;
 
-    public constructor(cliente: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
+    public constructor(cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, mediosDePago?: IMediosDePago) {
         super(cliente, diaSem, mediosDePago);
-        this.horarioDeRetiro = 0;
+        this.horarioDeRetiro = horarioRetiro;
         this.numeroDeTelefono = 0;
-        this.pedidoRetirado = false;
     }
 
 }
