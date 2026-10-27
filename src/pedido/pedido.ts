@@ -42,6 +42,7 @@ export abstract class Pedido {
     }
 
     public setMedioDePago(medioPago: IMediosDePago): void {
+        this.validarPedidoNoFacturado();
         this.medioDePago = medioPago;
     }
 
@@ -127,6 +128,12 @@ export abstract class Pedido {
     private validarPedidoEnConstruccion(): void {
         if (this.estadoDelPedido !== ESTADO_PEDIDO.EN_CONSTRUCCION) {
             throw new Error("El pedido no esta en construccion");
+        }
+    }
+
+    private validarPedidoNoFacturado(): void {
+        if (this.estadoDelPedido === ESTADO_PEDIDO.FACTURADO) {
+            throw new Error("El pedido esta facturado, no se puede cambiar el metodo de pago.");
         }
     }
 

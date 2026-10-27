@@ -7,6 +7,7 @@ import { Combo } from "../menu/combo";
 export class GestorPedidos {
 
     private pedido: Pedido;
+    // private pedidos: Map<number, Pedido>;
     private historialDePedidos: Map<number, Pedido>;
     private estaciones: Estacion[];
 

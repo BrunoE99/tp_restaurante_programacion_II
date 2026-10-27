@@ -6,12 +6,12 @@ import IMediosDePago from "../medios_de_pago/iMediosDePago";
 export class PedidoRetiro extends Pedido {
     
     private horarioDeRetiro: number;
-    private numeroDeTelefono: number;
-
-    public constructor(cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, mediosDePago?: IMediosDePago) {
+    private numeroDeTelefono: string;
+    public constructor(cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, numeroTel: string, 
+        mediosDePago?: IMediosDePago) {
         super(cliente, diaSem, mediosDePago);
         this.horarioDeRetiro = horarioRetiro;
-        this.numeroDeTelefono = 0;
+        this.numeroDeTelefono = numeroTel;
     }
 
 }
