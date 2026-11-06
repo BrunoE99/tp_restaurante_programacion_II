@@ -12,9 +12,14 @@ export class DescuentoPorPagoEfectivo implements Descuento {
     }
 
     public calcularDescuento(pedido: Pedido): number {
-        // falta esEfecitvo en  MediosDePago (Juan)
-        //  falta calcularPrecioTotal() ? en Pedido (Bruno)
-        return 0;
+        const medio = pedido.getMedioDePago();
+    if (medio === undefined) {
+            return 0;
+        } 
+    if (!medio.aplicaDescuentoEfectivo()) {
+            return 0;
+        } else {
+            return pedido.getPrecioTotal() * (this.porcentaje / 100);
+        }
     }
-
 }
