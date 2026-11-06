@@ -15,4 +15,4 @@ export default class TarjetaCredito extends AbstractTarjeta {
     public pagoCompletado(): void {
         console.log('Pago con tarjeta de credito completado con éxito.');
     }
-}
+    }
