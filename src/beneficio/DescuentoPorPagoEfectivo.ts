@@ -1,25 +1,19 @@
-import { Descuento } from './Descuento';
+import { DescuentoPorcentual } from './DescuentoPorcentual';
 import { Pedido } from '../pedido/pedido';
 
 const DESCUENTO_PAGO_EFECTIVO = 10;
 
-export class DescuentoPorPagoEfectivo implements Descuento {
-
-    private porcentaje: number;
+export class DescuentoPorPagoEfectivo extends DescuentoPorcentual {
 
     public constructor(porcentaje: number = DESCUENTO_PAGO_EFECTIVO) {
-        this.porcentaje = porcentaje;
+        super(porcentaje);
     }
 
-    public calcularDescuento(pedido: Pedido): number {
+    protected aplica(pedido: Pedido): boolean {
         const medio = pedido.getMedioDePago();
-    if (medio === undefined) {
-            return 0;
-        } 
-    if (!medio.aplicaDescuentoEfectivo()) {
-            return 0;
-        } else {
-            return pedido.getPrecioTotal() * (this.porcentaje / 100);
+        if (medio === undefined) {
+            return false;
         }
+        return medio.aplicaDescuentoEfectivo();
     }
 }
