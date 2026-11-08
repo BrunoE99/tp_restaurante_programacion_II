@@ -96,6 +96,7 @@ class PedidoEnvio {
 
 interface MediosDePago {
     + pagoCompletado()
+    + aplicaDescuentoEfectivo(): boolean
 }
 
 abstract class Tarjeta {
@@ -178,14 +179,24 @@ class BeneficioPorPrecioFijo {
 
 }
 
-class DescuentoPorPagoEfectivo {
-    - porcentajeAplicado
+interface Descuento {
+    + calcularDescuento(pedido: Pedido): number
 }
 
-class DescuentoPorDiaDeSemana {
-    - diasQueAplica
-    - porcentajeAplicado
-    - precioAplicado
+abstract class DescuentoPorcentual implements Descuento {
+    - porcentaje: number    
+
+    + calcularDescuento(pedido: Pedido): number
+    # abstract aplica(pedido: Pedido): boolean
+}
+
+class DescuentoPorPagoEfectivo extends DescuentoPorcentual {
+    # aplica(pedido: Pedido): boolean 
+}
+
+class DescuentoPorDiaDeSemana extends DescuentoPorcentual {
+    - diaQueAplica: DIA_SEMANA
+    # aplica(pedido: Pedido): boolean
 }
 
 
@@ -240,21 +251,22 @@ Estacion <|-- CocinaFria
 Estacion <|-u- Barra
 Estacion <|-- CocinaDulce
 
-Combo *-- Item
+Combo o-- Item
 Pedido *-- Producto
+Combo o-- Beneficio
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
-Beneficio <|.. DescuentoPorDiaDeSemana
-Beneficio <|.r. DescuentoPorPagoEfectivo
+DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
 'BeneficioPorPorcentaje <|-- DescuentoPorPagoEfectivo
 
-TarjetaCredito <|-- Tarjeta
-TarjetaDebito <|-- Tarjeta
+Tarjeta <|-- TarjetaCredito
+Tarjeta <|-- TarjetaDebito
 MediosDePago <|.. Tarjeta
 
-Efectivo <|.. MediosDePago
-BilleteraVirtual <|.. MediosDePago
+MediosDePago <|.. Efectivo
+MediosDePago <|.. BilleteraVirtual
 
 'dudas
 
