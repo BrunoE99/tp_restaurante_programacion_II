@@ -25,4 +25,8 @@ export default abstract class AbstractTarjeta implements MediosDePago {
 
     public abstract pagoCompletado(): void;
 
+    public aplicaDescuentoEfectivo(): boolean {
+        return false;
+    }
+
 }

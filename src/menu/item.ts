@@ -1,6 +1,7 @@
 import { CATEGORIA } from "../enums/categoria"
+import Producto from "./producto";
 
-export class Item {
+export class Item implements Producto {
     private nombre: string;
     private precio: number;
     private categoria: CATEGORIA;
