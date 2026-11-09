@@ -46,10 +46,8 @@ class GestorPedidos {
     + pedidoPago(mp: MediosDePago)
     + getHistorial(): Pedido[]
     + consultarHistorialPedido(numPedido: number): Pedido
-    + agregarItem()
-    + agregarCombo()
-    + eliminarItem()
-    + eliminarCombo()
+    + agregarProducto(producto: Producto)
+    + eliminarProducto(producto: Producto)
     + confirmarPedido()
     + asignarAEstaciones()
     + facturarPedido()
@@ -58,8 +56,7 @@ class GestorPedidos {
 abstract class Pedido {
     - numeroDePedido: number
     - cliente: Cliente
-    - items: Item[]
-    - combos: Combo[]
+    - productos: Producto[]
     - precioTotal: number
     - medioDePago: MediosDePago | undefined
     - estadoDelPedido: ESTADO_PEDIDO
@@ -72,11 +69,8 @@ abstract class Pedido {
     + confirmarPedido()
     - validarPedidoEnConstruccion()
     + facturarPedido()
-    + agregarItem(i: Item)
-    + agregarCombo(c: Combo)
-    + eliminarItem(i: Item)
-    + eliminarCombo(c: Combo)
-
+    + agregarProducto(producto: Producto)
+    + eliminarProducto(producto: Producto)
 }
 
 class PedidoSalon {
@@ -101,6 +95,7 @@ class PedidoEnvio {
 
 interface MediosDePago {
     + pagoCompletado()
+    + aplicaDescuentoEfectivo(): boolean
 }
 
 abstract class Tarjeta {
@@ -150,22 +145,26 @@ class Cadete {
 
 }
 
-Class Menu {
-    - combos: Combo[]
-    - items: Item[]
-}
+    Interface Producto {
+        getPrecio(): number
+        getEstadoProducto(): ESTADO_ITEM
+    }
 
-class Combo {
-    - items: Item[]
-    - precioCombo
-    - beneficios: Beneficio
-}
 
-class Item {
-    - estacion: Estacion
-    - estadoDelItem
-    - precioIndividual
-}
+    class Combo implements Producto {
+        - items: Item[]
+        - beneficio: Beneficio
+        - nombre: string
+    }
+
+    class Item implements Producto {
+        - estacion: Estacion
+        - estadoDelItem : ESTADO_ITEM
+        - precioIndividual : number
+        - nombre : string
+
+        + avanzarEstadoItem(): void
+    }
 
 interface Beneficio {
     + calcularBeneficio()
@@ -179,14 +178,24 @@ class BeneficioPorPrecioFijo {
 
 }
 
-class DescuentoPorPagoEfectivo {
-    - porcentajeAplicado
+interface Descuento {
+    + calcularDescuento(pedido: Pedido): number
 }
 
-class DescuentoPorDiaDeSemana {
-    - diasQueAplica
-    - porcentajeAplicado
-    - precioAplicado
+abstract class DescuentoPorcentual implements Descuento {
+    - porcentaje: number    
+
+    + calcularDescuento(pedido: Pedido): number
+    # abstract aplica(pedido: Pedido): boolean
+}
+
+class DescuentoPorPagoEfectivo extends DescuentoPorcentual {
+    # aplica(pedido: Pedido): boolean 
+}
+
+class DescuentoPorDiaDeSemana extends DescuentoPorcentual {
+    - diaQueAplica: DIA_SEMANA
+    # aplica(pedido: Pedido): boolean
 }
 
 
@@ -241,23 +250,22 @@ Estacion <|-- CocinaFria
 Estacion <|-u- Barra
 Estacion <|-- CocinaDulce
 
-Menu *-- Item
-Menu *-- Combo
-Combo *-r- Item
-Item o-- Estacion
+Combo o-- Item
+Pedido *-- Producto
+Combo o-- Beneficio
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
-Beneficio <|.. DescuentoPorDiaDeSemana
-Beneficio <|.r. DescuentoPorPagoEfectivo
+DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
 'BeneficioPorPorcentaje <|-- DescuentoPorPagoEfectivo
 
-TarjetaCredito <|-- Tarjeta
-TarjetaDebito <|-- Tarjeta
+Tarjeta <|-- TarjetaCredito
+Tarjeta <|-- TarjetaDebito
 MediosDePago <|.. Tarjeta
 
-Efectivo <|.. MediosDePago
-BilleteraVirtual <|.. MediosDePago
+MediosDePago <|.. Efectivo
+MediosDePago <|.. BilleteraVirtual
 
 'dudas
 
