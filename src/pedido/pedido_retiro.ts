@@ -8,9 +8,9 @@ export class PedidoRetiro extends Pedido {
     private horarioDeRetiro: number;
     private numeroDeTelefono: string;
     
-    public constructor(cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, numeroTel: string, 
+    public constructor(numero: number, cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, numeroTel: string, 
         mediosDePago?: IMediosDePago) {
-        super(cliente, diaSem, mediosDePago);
+        super(numero, cliente, diaSem, mediosDePago);
         this.horarioDeRetiro = horarioRetiro;
         this.numeroDeTelefono = numeroTel;
     }

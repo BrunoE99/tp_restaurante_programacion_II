@@ -8,8 +8,9 @@ export class PedidoEnvio extends Pedido {
     private direccionDeEntrega: string;
     private costoDeEnvio: number;
 
-    public constructor(direccion: string, cliente: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
-        super(cliente, diaSem, mediosDePago);
+    public constructor(numero: number, direccion: string, cliente: Cliente, diaSem: CalculoDia, 
+        mediosDePago?: IMediosDePago) {
+        super(numero, cliente, diaSem, mediosDePago);
         this.direccionDeEntrega = direccion;
         this.costoDeEnvio = 0;
     }

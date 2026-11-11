@@ -1,5 +1,5 @@
 import { CATEGORIA } from "../enums/categoria";
-import { ItemPedido } from "../pedido/itemPedido";
+import { ItemPedido } from "../pedido/item_pedido";
 
 export default abstract class Estacion {
 

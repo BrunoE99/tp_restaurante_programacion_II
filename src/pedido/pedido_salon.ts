@@ -7,8 +7,9 @@ export class PedidoSalon extends Pedido {
 
     private numeroDeMesa: number;
 
-    public constructor(cliente: Cliente, diaSem: CalculoDia, numeroMesa: number, mediosDePago?: IMediosDePago) {
-        super(cliente, diaSem, mediosDePago);
+    public constructor(numero: number, cliente: Cliente, diaSem: CalculoDia, numeroMesa: number, 
+        mediosDePago?: IMediosDePago) {
+        super(numero, cliente, diaSem, mediosDePago);
         this.numeroDeMesa = numeroMesa;
     }
 

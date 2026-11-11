@@ -3,13 +3,13 @@ import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
 import Cliente from "../empleados-cliente/cliente";
-import { ItemPedido } from "./itemPedido";
+import { ItemPedido } from "./item_pedido";
 import Producto from "../menu/producto";
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
 
 export abstract class Pedido { 
 
-    private numeroDePedido: number;
+    private readonly numeroDePedido: number;
     private cliente: Cliente;
     private productos: Producto[];
     private precioTotal: number;
@@ -18,8 +18,8 @@ export abstract class Pedido {
     private diaActual: DIA_SEMANA;
     private itemsPedidos: ItemPedido[];
 
-    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
-        this.numeroDePedido = 0;
+    public constructor(numero: number, client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
+        this.numeroDePedido = numero;
         this.cliente = client;
         this.productos = [];
         this.itemsPedidos = [];
@@ -27,10 +27,6 @@ export abstract class Pedido {
         this.medioDePago = mediosDePago;
         this.estadoDelPedido = ESTADO_PEDIDO.EN_CONSTRUCCION;
         this.diaActual = diaSem.calculoDia();
-    }
-    
-    protected setNumeroDePedido(numero: number): void {
-        this.numeroDePedido = numero;
     }
 
     public getNumeroDePedido(): number {
