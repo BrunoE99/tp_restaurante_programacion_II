@@ -23,4 +23,8 @@ export class Item implements Producto {
     public getCategoria(): CATEGORIA {
         return this.categoria;
     }
+
+    public getItems(): Item[] {
+        return [this];
+    }
 }

@@ -22,7 +22,7 @@ export class Combo implements Producto {
     }
 
     public getItems(): Item[] {
-        return this.items;
+        return [...this.items];
     }
 
     private getPrecioTotalItems(): number {
@@ -33,6 +33,5 @@ export class Combo implements Producto {
     public getPrecio(): number {
         return this.beneficio.calcularBeneficio(this.getPrecioTotalItems());
     }
-
-
+    
 }

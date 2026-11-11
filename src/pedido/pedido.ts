@@ -3,26 +3,26 @@ import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
 import Cliente from "../empleados-cliente/cliente";
-import { Item } from "../menu/item";
-import { Combo } from "../menu/combo";
+import { ItemPedido } from "./itemPedido";
+import Producto from "../menu/producto";
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
 
 export abstract class Pedido { 
 
     private numeroDePedido: number;
     private cliente: Cliente;
-    private items: Item[];
-    private combos: Combo[];
+    private productos: Producto[];
     private precioTotal: number;
     private medioDePago: IMediosDePago | undefined;
     private estadoDelPedido: ESTADO_PEDIDO;
     private diaActual: DIA_SEMANA;
+    private itemsPedidos: ItemPedido[];
 
     public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
         this.numeroDePedido = 0;
         this.cliente = client;
-        this.items = [];
-        this.combos = [];
+        this.productos = [];
+        this.itemsPedidos = [];
         this.precioTotal = 0;
         this.medioDePago = mediosDePago;
         this.estadoDelPedido = ESTADO_PEDIDO.EN_CONSTRUCCION;
@@ -60,66 +60,62 @@ export abstract class Pedido {
     
     public estadoItems(): ESTADO_ITEM {
 
-        if (this.items.length === 0 && this.combos.length === 0) {
+        if (this.itemsPedidos.length === 0) {
             return ESTADO_ITEM.PENDIENTE;
         }
 
-        const estadosItems = this.items.map(item => item.getEstadoItem());
-        const estadosCombos = this.combos.map(combo => combo.getEstadoCombo());
-
-        return Math.min(...estadosItems, ...estadosCombos) as ESTADO_ITEM;
+        return Math.min(...this.itemsPedidos.map(itemPedido => itemPedido.getEstado())) as ESTADO_ITEM;
     }
 
-    public agregarItem(item: Item): void {
+    public getItemsAPreparar(): ItemPedido[] {
+
+        return [...this.itemsPedidos];
+
+    }
+
+    public agregarProducto(producto: Producto): void {
+
         this.validarPedidoEnConstruccion();
-        this.items.push(item);
+        this.productos.push(producto);
         this.calcularPrecio();
+
     }
 
-    public eliminarItem(item: Item): void {
+    public eliminarProducto(producto: Producto): void {
+
         this.validarPedidoEnConstruccion();
-        const posicion: number = this.items.findIndex((itemArray) => itemArray === item);
+
+        const posicion: number = this.productos.indexOf(producto);
 
         if (posicion >= 0) {
-            this.items.splice(posicion, 1);
-        }
-
-        this.calcularPrecio();
-    }
-
-    public agregarCombo(combo: Combo): void {
-        this.validarPedidoEnConstruccion();
-        this.combos.push(combo);
-        this.calcularPrecio();
-    }
-
-    public eliminarCombo(combo: Combo): void {
-        this.validarPedidoEnConstruccion();
-        const posicion: number = this.combos.findIndex((comboArray) => comboArray === combo);
-
-        if (posicion >= 0) {
-            this.combos.splice(posicion, 1);
+            this.productos.splice(posicion, 1);
         }
 
         this.calcularPrecio();
     }
 
     protected calcularPrecio(): void {
-        const valorInicialItems = 0;
-        const precioItems: number = this.items.reduce((acumulador, valorAct) => acumulador + 
-        valorAct.getPrecioIndividual(), valorInicialItems);
 
-        const valorInicialCombos = 0;
-        const precioCombos: number = this.combos.reduce((acumulador, valorAct) => acumulador + 
-        valorAct.getPrecioCombo(), valorInicialCombos);
+        const valorInicial = 0;
 
-        this.precioTotal = precioItems + precioCombos;
+        this.precioTotal = this.productos.reduce((acumulador, producto) => 
+            acumulador + producto.getPrecio(), valorInicial);
     }
 
     public confirmarPedido(): void {
+
         this.validarPedidoEnConstruccion();
-        if (this.items.length === 0 && this.combos.length === 0) {
+
+        if (this.productos.length === 0) {
             throw new Error("El pedido no tiene items ni combos a confirmar");
+        }
+
+        this.itemsPedidos = [];
+
+        for (const producto of this.productos) {
+            for (const item of producto.getItems()) {
+                this.itemsPedidos.push(new ItemPedido(item));
+            }
         }
 
         this.estadoDelPedido = ESTADO_PEDIDO.CONFIRMADO;

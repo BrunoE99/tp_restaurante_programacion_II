@@ -7,6 +7,7 @@ export class PedidoRetiro extends Pedido {
     
     private horarioDeRetiro: number;
     private numeroDeTelefono: string;
+    
     public constructor(cliente: Cliente, diaSem: CalculoDia, horarioRetiro: number, numeroTel: string, 
         mediosDePago?: IMediosDePago) {
         super(cliente, diaSem, mediosDePago);
