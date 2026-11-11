@@ -20,7 +20,7 @@ export class FabricaPedidoEnvio implements FabricaPedido {
     }
 
     public crearPedido(numero: number): Pedido {
-        return new PedidoEnvio(numero, this.direccion, this.cliente, this.diaSem, this.mediosDePago);
+        return new PedidoEnvio(numero, this.cliente, this.diaSem, this.direccion, this.mediosDePago);
     }
 
 }

@@ -1,5 +1,4 @@
 import { DIA_SEMANA } from "../enums/dia_semana"
-import { ESTADO_ITEM } from "../enums/estado_item";
 import { ESTADO_PEDIDO } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
 import Cliente from "../empleados-cliente/cliente";
@@ -54,13 +53,10 @@ export abstract class Pedido {
         return this.precioTotal;
     }
     
-    public estadoItems(): ESTADO_ITEM {
+    public todosItemsListos(): boolean {
 
-        if (this.itemsPedidos.length === 0) {
-            return ESTADO_ITEM.PENDIENTE;
-        }
+        return this.itemsPedidos.length > 0 && this.itemsPedidos.every(itemPedido => itemPedido.estaListo());
 
-        return Math.min(...this.itemsPedidos.map(itemPedido => itemPedido.getEstado())) as ESTADO_ITEM;
     }
 
     public getItemsAPreparar(): ItemPedido[] {
@@ -133,7 +129,7 @@ export abstract class Pedido {
         if (this.estadoDelPedido !== ESTADO_PEDIDO.CONFIRMADO) {
             throw new Error("El pedido no se encuentra confirmado.");
         }
-        if (this.estadoItems() !== ESTADO_ITEM.LISTO) {
+        if (!this.todosItemsListos()) {
             throw new Error("Los items y/o combos no estan listos.")
         }
         if (this.medioDePago === undefined) {

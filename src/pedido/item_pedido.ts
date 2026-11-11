@@ -28,6 +28,10 @@ export class ItemPedido {
         return this.estado;
     }
 
+    public estaListo(): boolean {
+        return this.estado === ESTADO_ITEM.LISTO;
+    }
+
     public iniciarPreparacion(): void {
         if (this.estado !== ESTADO_ITEM.PENDIENTE) {
             throw new Error (`${this.getNombre()} no esta pendiente.`);
