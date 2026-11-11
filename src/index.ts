@@ -12,11 +12,11 @@ import { CATEGORIA } from "./enums/categoria";
 
 // Crear Items
 const hamburguesa = new Item(
-  "Hamburguesa", 5000, CATEGORIA.PLATO_PRINCIPAL
+  "Hamburguesa", 5000, CATEGORIA.CARNE
 );
 
-const papasFritas = new Item(
-  "Papas Fritas", 2000, CATEGORIA.ENTRADA
+const ensaladaCesar = new Item(
+  "Ensalada cesar", 2000, CATEGORIA.ENSALADA
 );
 
 const gaseosa = new Item(
@@ -25,7 +25,7 @@ const gaseosa = new Item(
 
 // Crear Combo
 const comboHamburguesa = new Combo(
-  "Combo de Hamburguesa", [hamburguesa, papasFritas, gaseosa]
+  "Combo de Hamburguesa", [hamburguesa, ensaladaCesar, gaseosa]
 );
 
 // Crear Menu 
@@ -33,7 +33,7 @@ const menu = new Menu();
 
 // Agregar Items al Menu 
 menu.agregarItem(hamburguesa);
-menu.agregarItem(papasFritas);
+menu.agregarItem(ensaladaCesar);
 menu.agregarItem(gaseosa);
 
 // Agregar Combo al Menu

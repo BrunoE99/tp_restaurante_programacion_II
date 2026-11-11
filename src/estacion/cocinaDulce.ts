@@ -1,18 +1,10 @@
 import Estacion from "./estacion";
-import { ESTADO_ITEM } from "../enums/estado_item";
+import { CATEGORIA } from "../enums/categoria";
 
 export default class CocinaDulce extends Estacion {
 
-    public preparar(item: Item): Item {
-        if (this.itemValido(item, "POSTRE") == false) {
-            return null;
-        } else {
-            item.estado = ESTADO_ITEM.EN_PREPARACION;
-            console.log("item en preparacion en cocina dulce");
-            item.estado = ESTADO_ITEM.LISTO;
-            console.log("item listo en cocina dulce");
-            return item;
-        }
+    public constructor() {
+        super([CATEGORIA.POSTRE]);
     }
 
 }

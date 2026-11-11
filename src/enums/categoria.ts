@@ -1,6 +1,6 @@
 export enum CATEGORIA {
-  ENTRADA,
-  PLATO_PRINCIPAL,
+  CARNE,
+  ENSALADA,
   BEBIDA,
   POSTRE
 }

@@ -2,6 +2,13 @@
 
 skinparam classAttributeIconSize 0
 
+enum CATEGORIA {
+    CARNE,
+    ENSALADA,
+    BEBIDA,
+    POSTRE
+}
+
 enum ESTADO_ITEM {
     PENDIENTE
     EN_PREPARACION
@@ -14,13 +21,6 @@ enum ESTADO_PEDIDO {
     FACTURADO
 }
 
-enum MEDIO_DE_PAGO {
-    EFECTIVO
-    TARJETA_DEBITO
-    TARJETA_CREDITO
-    BILLETERA_VIRTUAL
-}
-
 enum DIA_SEMANA {
     DOMINGO
     LUNES
@@ -29,13 +29,6 @@ enum DIA_SEMANA {
     JUEVES
     VIERNES
     SABADO 
-}
-
-enum TIPO_ESTACION {
-    PARRILLA
-    COCINA_FRIA
-    BARRA
-    COCINA_DULCE
 }
 
 class GestorPedidos {
@@ -200,27 +193,25 @@ class DescuentoPorDiaDeSemana extends DescuentoPorcentual {
 
 
 abstract class Estacion {
+    - siguiente: Estacion | undefined
     - items: Item[]
+    - itemsEnPreparacion: Item[]
+    - categorias: CATEGORIA[]
 
-    + preparandoItem()
-    + itemFinalizado()
+    + setSiguiente(estacion: Estacion): void
+    + recibir(item: Item): void
+    + iniciarSiguiente(): Item
+    + finalizar(item: Item): void
+    # acepta(item: Item): boolean
 }
 
-class Parrilla {
+class Parrilla {}
 
-}
+class CocinaFria {}
 
-class CocinaFria {
-    
-}
+class Barra {}
 
-class Barra {
-    
-}
-
-class CocinaDulce {
-    
-}
+class CocinaDulce {}
 
 class CalculoDia {
     - fecha: Date
@@ -245,10 +236,14 @@ PedidoEnvio *-- Cadete
 Empleado <|-- Mozo
 Empleado <|-- Cadete
 
-Estacion <|-r- Parrilla
+Estacion <|-- Parrilla
 Estacion <|-- CocinaFria
-Estacion <|-u- Barra
+Estacion <|-- Barra
 Estacion <|-- CocinaDulce
+
+Estacion o-- Estacion
+Estacion o-- Item
+GestorPedidos o-- Estacion
 
 Combo o-- Item
 Pedido *-- Producto

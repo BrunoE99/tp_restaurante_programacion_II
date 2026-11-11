@@ -1,20 +1,21 @@
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
 import Estacion from "../estacion/estacion";
 import { Pedido } from "./pedido";
-import { Item } from "../menu/item";
-import { Combo } from "../menu/combo";
+// import { Item } from "../menu/item";
+// import { Combo } from "../menu/combo";
+import Producto from "../menu/producto";
 
 export class GestorPedidos {
 
     private pedido: Pedido;
     // private pedidos: Map<number, Pedido>;
     private historialDePedidos: Map<number, Pedido>;
-    private estaciones: Estacion[];
+    private primeraEstacion: Estacion;
 
-    public constructor(pedid: Pedido, estacionesParam: Estacion[]) {
+    public constructor(pedid: Pedido, primeraEstacion: Estacion) {
         this.pedido = pedid;
         this.historialDePedidos = new Map<number, Pedido>();
-        this.estaciones = estacionesParam;
+        this.primeraEstacion = primeraEstacion;
     }
 
     public getPedido(): Pedido {
@@ -45,20 +46,12 @@ export class GestorPedidos {
         return pedidoConsultado;
     }
 
-    public agregarItem(item: Item): void {
-        this.pedido.agregarItem(item);
+    public agregarProducto(producto: Producto): void {
+        this.pedido.agregarProducto(producto);
     }
 
-    public eliminarItem(item: Item): void {
-        this.pedido.eliminarItem(item);
-    }
-
-    public agregarCombo(combo: Combo): void {
-        this.pedido.agregarCombo(combo);
-    }
-
-    public eliminarCombo(combo: Combo): void {
-        this.pedido.eliminarCombo(combo);
+    public eliminarProducto(producto: Producto): void {
+        this.pedido.eliminarProducto(producto);
     }
 
     public confirmarPedido(): void {
@@ -71,8 +64,10 @@ export class GestorPedidos {
         this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
     }
 
-    public asignarAEstaciones(): void {
-        // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
+    private asignarAEstaciones(): void {
+        for (const item of this.pedido.getItemsAPreparar()) {
+            this.primeraEstacion.recibir(item);
+        }
     }
 
 }
