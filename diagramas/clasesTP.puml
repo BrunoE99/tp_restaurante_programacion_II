@@ -32,58 +32,101 @@ enum DIA_SEMANA {
 }
 
 class GestorPedidos {
-    - pedido: Pedido
+    - pedidosEnCurso: Map<number, Pedido>
     - historialDePedidos: Map<number, Pedido>
-    - estaciones: Estacion[]
+    - primeraEstacion: Estacion
+    - numerador: NumeradorPedidos
 
-    + pedidoPago(mp: MediosDePago)
+    + registrarPedido(fabrica: FabricaPedido): number
+    + getPedidoEnCurso(numero: number): Pedido
+    + pedidoPago(numero: number, medioPago: MediosDePago)
     + getHistorial(): Pedido[]
     + consultarHistorialPedido(numPedido: number): Pedido
-    + agregarProducto(producto: Producto)
-    + eliminarProducto(producto: Producto)
-    + confirmarPedido()
-    + asignarAEstaciones()
-    + facturarPedido()
+    + agregarProducto(numero: number, producto: Producto)
+    + eliminarProducto(numero: number, producto: Producto)
+    + confirmarPedido(numero: number)
+    + facturarPedido(numero: number)
+    - buscarPedidoEnCurso(numero: number): Pedido
+    - asignarAEstaciones(pedido: Pedido)
+}
+
+class NumeradorPedidos {
+    - ultimoNumero: number
+
+    + siguienteNumero(): number
+}
+
+interface FabricaPedido {
+    + crearPedido(numero: number): Pedido
+}
+
+class FabricaPedidoSalon {
+    - cliente: Cliente
+    - diaSem: CalculoDia
+    - numeroMesa: number
+    - mediosDePago: MediosDePago | undefined
+
+    + crearPedido(numero: number): Pedido
+}
+
+class FabricaPedidoRetiro {
+    - cliente: Cliente
+    - diaSem: CalculoDia
+    - horarioRetiro: number
+    - numeroTel: string
+    - mediosDePago: MediosDePago | undefined
+
+    + crearPedido(numero: number): Pedido
+}
+
+class FabricaPedidoEnvio {
+    - cliente: Cliente
+    - diaSem: CalculoDia
+    - direccion: string
+    - mediosDePago: MediosDePago | undefined
+
+    + crearPedido(numero: number): Pedido
 }
 
 abstract class Pedido {
-    - numeroDePedido: number
+    - numeroDePedido: number {readOnly}
     - cliente: Cliente
     - productos: Producto[]
+    - itemsPedidos: ItemPedido[]
     - precioTotal: number
     - medioDePago: MediosDePago | undefined
     - estadoDelPedido: ESTADO_PEDIDO
     - diaActual: DIA_SEMANA
 
-    '# abstract pedir()
-    '# abstract entregar() 
-    + estadoItems(): ESTADO_ITEM
-    # calcularPrecio()
-    + confirmarPedido()
-    - validarPedidoEnConstruccion()
-    + facturarPedido()
+    + getNumeroDePedido(): number
+    + getMedioDePago(): MediosDePago | undefined
+    + setMedioDePago(medioPago: MediosDePago)
+    + getEstadoPedido(): ESTADO_PEDIDO
+    + getDiaActual(): DIA_SEMANA
+    + getPrecioTotal(): number
+    + getItemsAPreparar(): ItemPedido[]
+    + todosItemsListos(): boolean
     + agregarProducto(producto: Producto)
     + eliminarProducto(producto: Producto)
+    + confirmarPedido()
+    + facturarPedido()
+    # calcularPrecio()
+    - validarPedidoEnConstruccion()
+    - validarPedidoNoFacturado()
 }
 
 class PedidoSalon {
-    - mozo: Mozo
     - numeroDeMesa: number
-    '- pedidoMesaCerrada: boolean
 }
 
 class PedidoRetiro {
     - horarioDeRetiro: number
-    - numeroDeTelefono: number
-    '- pedidoRetirado: boolean
+    - numeroDeTelefono: string
 }
 
 class PedidoEnvio {
     - direccionDeEntrega: string
     - costoDeEnvio: number
-    - cadete: Cadete
-    - barrio: string
-    '- pedidoEntregado: boolean
 }
 
 interface MediosDePago {
@@ -138,26 +181,57 @@ class Cadete {
 
 }
 
-    Interface Producto {
-        getPrecio(): number
-        getEstadoProducto(): ESTADO_ITEM
-    }
+class Menu {
+    - items: Item[]
+    - combos: Combo[]
 
+    + agregarItem(item: Item)
+    + eliminarItem(item: Item)
+    + consultarItems(): Item[]
+    + agregarCombo(combo: Combo)
+    + eliminarCombo(combo: Combo)
+    + consultarCombos(): Combo[]
+}
 
-    class Combo implements Producto {
-        - items: Item[]
-        - beneficio: Beneficio
-        - nombre: string
-    }
+Interface Producto {
+    + getPrecio(): number
+    + getItems(): Item[]
+}
 
-    class Item implements Producto {
-        - estacion: Estacion
-        - estadoDelItem : ESTADO_ITEM
-        - precioIndividual : number
-        - nombre : string
+class Combo implements Producto {
+    - items: Item[]
+    - beneficio: Beneficio
+    - nombre: string
 
-        + avanzarEstadoItem(): void
-    }
+    + getNombre(): string
+    + getItems(): Item[]
+    + getPrecio(): number
+    - getPrecioTotalItems(): number
+}
+
+class Item implements Producto {
+    - nombre: string
+    - precio: number
+    - categoria: CATEGORIA
+
+    + getNombre(): string
+    + getPrecio(): number
+    + getCategoria(): CATEGORIA
+    + getItems(): Item[]
+}
+
+class ItemPedido {
+    - item: Item
+    - estado: ESTADO_ITEM
+
+    + getItem(): Item
+    + getNombre(): string
+    + getCategoria(): CATEGORIA
+    + getEstado(): ESTADO_ITEM
+    + estaListo(): boolean
+    + iniciarPreparacion()
+    + marcarListo()
+}
 
 interface Beneficio {
     + calcularBeneficio()
@@ -182,27 +256,34 @@ abstract class DescuentoPorcentual implements Descuento {
     # abstract aplica(pedido: Pedido): boolean
 }
 
-class DescuentoPorPagoEfectivo extends DescuentoPorcentual {
+class DescuentoPorPagoEfectivo {
     # aplica(pedido: Pedido): boolean 
 }
 
-class DescuentoPorDiaDeSemana extends DescuentoPorcentual {
+class DescuentoPorDiaDeSemana {
     - diaQueAplica: DIA_SEMANA
     # aplica(pedido: Pedido): boolean
 }
 
-
 abstract class Estacion {
     - siguiente: Estacion | undefined
-    - items: Item[]
-    - itemsEnPreparacion: Item[]
+    - items: ItemPedido[]
+    - itemsEnPreparacion: ItemPedido[]
     - categorias: CATEGORIA[]
 
-    + setSiguiente(estacion: Estacion): void
-    + recibir(item: Item): void
-    + iniciarSiguiente(): Item
-    + finalizar(item: Item): void
-    # acepta(item: Item): boolean
+    + setSiguiente(estacion: Estacion)
+    + recibir(item: ItemPedido)
+    + iniciarSiguiente(): ItemPedido
+    + finalizar(item: ItemPedido)
+    # acepta(item: ItemPedido): boolean
+}
+
+class CadenaEstaciones {
+    - primeraEstacion: Estacion
+    - estaciones: Estacion[]
+
+    + getPrimeraEstacion(): Estacion
+    + getEstaciones(): Estacion[]
 }
 
 class Parrilla {}
@@ -221,20 +302,36 @@ class CalculoDia {
 
 'relaciones
 
-Pedido <|-l- PedidoSalon
-Pedido <|-r- PedidoRetiro
+Pedido <|-- PedidoSalon
+Pedido <|-- PedidoRetiro
 Pedido <|-- PedidoEnvio
 
 CalculoDia <.. Pedido
 
 GestorPedidos o-- Pedido
-GestorPedidos *-- Estacion
+GestorPedidos *-- NumeradorPedidos
+GestorPedidos o-- Estacion
+GestorPedidos ..> FabricaPedido
 
-PedidoSalon *-- Mozo
-PedidoEnvio *-- Cadete
+FabricaPedido <|.. FabricaPedidoSalon
+FabricaPedido <|.. FabricaPedidoRetiro
+FabricaPedido <|.. FabricaPedidoEnvio
+FabricaPedidoSalon ..> PedidoSalon
+FabricaPedidoRetiro ..> PedidoRetiro
+FabricaPedidoEnvio ..> PedidoEnvio
 
 Empleado <|-- Mozo
 Empleado <|-- Cadete
+
+Pedido o-- Producto
+Pedido *-- ItemPedido
+ItemPedido o-- Item
+
+Menu o-- Item
+Menu o-- Combo
+
+Combo o-- Item
+Combo o-- Beneficio
 
 Estacion <|-- Parrilla
 Estacion <|-- CocinaFria
@@ -242,18 +339,13 @@ Estacion <|-- Barra
 Estacion <|-- CocinaDulce
 
 Estacion o-- Estacion
-Estacion o-- Item
-GestorPedidos o-- Estacion
-
-Combo o-- Item
-Pedido *-- Producto
-Combo o-- Beneficio
+Estacion o-- ItemPedido
+CadenaEstaciones *-- Estacion
 
 Beneficio <|.. BeneficioPorPorcentaje
 Beneficio <|.. BeneficioPorPrecioFijo
 DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
 DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
-'BeneficioPorPorcentaje <|-- DescuentoPorPagoEfectivo
 
 Tarjeta <|-- TarjetaCredito
 Tarjeta <|-- TarjetaDebito
@@ -261,23 +353,5 @@ MediosDePago <|.. Tarjeta
 
 MediosDePago <|.. Efectivo
 MediosDePago <|.. BilleteraVirtual
-
-'dudas
-
-'en el orden en que le fue llegando: en estacion o en pedido
-'tenemos muchos enums? (enum de tipo beneficio) -> no confundirnos TIPO DE DATO con ENUMs - validar si tiene sentido tener ENUM y CLASES (caso de metodos de pago)
-'que es un "descuento especial" los dias de semana -> nos podemos tomar la libertad de definirlo como queramos
-'datos de tarjeta estan de mas -> puede ser, analizar si es realmente necesario
-'si la interfaz se puede usar como tipo de dato (MediosDePago) -> si, es un tipo de dato (como clase abstracta)
-'interfaz de MediosDePago estaria bien o no es necesaria/deberia ser clase -> depende de nuestra solucion
-'unificamos agregar/eliminarItem/Combo() a un tipo Producto -> depende de nuestra solucion
-
-'pendientes - revisar diagrama
-
-'flechas invertidas: TarjetaCredito/TarjetaDebito con Tarjeta (herencia), Efectivo/BilleteraVirtual con MediosDePago (realizacion)
-'revisar composiciones: PedidoSalon-Mozo, PedidoEnvio-Cadete, GestorPedidos-Estacion (llegan por constructor), Item con 2 duenios (Menu y Combo)
-'decidir que asociaciones dibujar (el atributo tipado ya expresa la relacion) y ordenar layout (package, together, direcciones)
-'visibilidad: GestorPedidos asignarAEstaciones (-)
-'Tarjeta tiene atributo medioDePago y ademas implementa MediosDePago -> redundante?
 
 @enduml
