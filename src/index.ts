@@ -40,7 +40,6 @@ function armarMenu(): Menu {
     menu.agregarItem(item);
   }
 
-  // Creacion de combos
   menu.agregarCombo(comboHamburguesa);
   menu.agregarCombo(comboParrillero);
 
