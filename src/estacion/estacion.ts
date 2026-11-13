@@ -1,4 +1,4 @@
-import { CATEGORIA } from "../enums/categoria";
+import { Categoria } from "../enums/categoria";
 import { ErrorEstacionItemNoEnPreparacion } from "../excepciones/estacion/error_estacion_item_no_en_preparacion";
 import { ErrorEstacionNoEncontrada } from "../excepciones/estacion/error_estacion_no_encontrada";
 import { ErrorEstacionSinItems } from "../excepciones/estacion/error_estacion_sin_items";
@@ -9,10 +9,10 @@ export default abstract class Estacion {
     private siguiente: Estacion | undefined;
     private items: ItemPedido[];
     private itemsEnPreparacion: ItemPedido[];
-    private categorias: CATEGORIA[];
+    private categorias: Categoria[];
     private readonly nombre: string;
 
-    public constructor (nombre: string, categorias: CATEGORIA[]) {
+    public constructor (nombre: string, categorias: Categoria[]) {
         this.nombre = nombre;
         this.siguiente = undefined;
         this.items = [];

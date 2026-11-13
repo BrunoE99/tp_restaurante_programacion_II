@@ -1,5 +1,5 @@
-import { DIA_SEMANA } from "../enums/dia_semana"
-import { ESTADO_PEDIDO } from "../enums/estado_pedido"
+import { DiaSemana } from "../enums/dia_semana"
+import { EstadoPedido } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
 import Cliente from "../empleados-cliente/cliente";
 import { ItemPedido } from "./item_pedido";
@@ -18,8 +18,8 @@ export abstract class Pedido {
     private productos: Producto[];
     private precioTotal: number;
     private medioDePago: IMediosDePago | undefined;
-    private estadoDelPedido: ESTADO_PEDIDO;
-    private diaActual: DIA_SEMANA;
+    private estadoDelPedido: EstadoPedido;
+    private diaActual: DiaSemana;
     private itemsPedidos: ItemPedido[];
 
     public constructor(numero: number, client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
@@ -29,7 +29,7 @@ export abstract class Pedido {
         this.itemsPedidos = [];
         this.precioTotal = 0;
         this.medioDePago = mediosDePago;
-        this.estadoDelPedido = ESTADO_PEDIDO.EN_CONSTRUCCION;
+        this.estadoDelPedido = EstadoPedido.EN_CONSTRUCCION;
         this.diaActual = diaSem.calculoDia();
     }
 
@@ -46,11 +46,11 @@ export abstract class Pedido {
         this.medioDePago = medioPago;
     }
 
-    public getEstadoPedido(): ESTADO_PEDIDO {
+    public getEstadoPedido(): EstadoPedido {
         return this.estadoDelPedido;
     }
 
-    public getDiaActual(): DIA_SEMANA {
+    public getDiaActual(): DiaSemana {
         return this.diaActual;
     }
 
@@ -115,24 +115,24 @@ export abstract class Pedido {
             }
         }
 
-        this.estadoDelPedido = ESTADO_PEDIDO.CONFIRMADO;
+        this.estadoDelPedido = EstadoPedido.CONFIRMADO;
     }
 
     private validarPedidoEnConstruccion(): void {
-        if (this.estadoDelPedido !== ESTADO_PEDIDO.EN_CONSTRUCCION) {
-            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, ESTADO_PEDIDO.EN_CONSTRUCCION);
+        if (this.estadoDelPedido !== EstadoPedido.EN_CONSTRUCCION) {
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, EstadoPedido.EN_CONSTRUCCION);
         }
     }
 
     private validarPedidoNoFacturado(): void {
-        if (this.estadoDelPedido === ESTADO_PEDIDO.FACTURADO) {
+        if (this.estadoDelPedido === EstadoPedido.FACTURADO) {
             throw new ErrorPedidoYaFacturado(this.numeroDePedido);
         }
     }
 
     public facturarPedido(): void {
-        if (this.estadoDelPedido !== ESTADO_PEDIDO.CONFIRMADO) {
-            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, ESTADO_PEDIDO.CONFIRMADO);
+        if (this.estadoDelPedido !== EstadoPedido.CONFIRMADO) {
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, EstadoPedido.CONFIRMADO);
         }
         if (!this.todosItemsListos()) {
             throw new ErrorPedidoItemsNoListos(this.numeroDePedido);
@@ -141,7 +141,7 @@ export abstract class Pedido {
             throw new ErrorPedidoNoExisteMedioDePago(this.numeroDePedido);
         }
 
-        this.estadoDelPedido = ESTADO_PEDIDO.FACTURADO;
+        this.estadoDelPedido = EstadoPedido.FACTURADO;
     }
 
 }

@@ -1,9 +1,9 @@
-import { CATEGORIA } from "../../enums/categoria";
+import { Categoria } from "../../enums/categoria";
 
 export class ErrorEstacionNoEncontrada extends Error {
 
-    public constructor(nombreItem: string, categoria: CATEGORIA) {
-        super(`Ninguna estacion puede preparar la categoria ${CATEGORIA[categoria]} (item: ${nombreItem}).`);
+    public constructor(nombreItem: string, categoria: Categoria) {
+        super(`Ninguna estacion puede preparar la categoria ${Categoria[categoria]} (item: ${nombreItem}).`);
         this.name = "ErrorEstacionNoEncontrada";
     }
 

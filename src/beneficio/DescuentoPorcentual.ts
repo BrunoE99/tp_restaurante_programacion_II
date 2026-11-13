@@ -1,5 +1,6 @@
 import {Descuento} from "./Descuento";
 import  {Pedido} from "../pedido/pedido";
+
 export abstract class DescuentoPorcentual implements Descuento {
     private porcentaje: number;
 

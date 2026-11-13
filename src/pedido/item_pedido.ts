@@ -1,16 +1,16 @@
-import { CATEGORIA } from "../enums/categoria";
-import { ESTADO_ITEM } from "../enums/estado_item";
+import { Categoria } from "../enums/categoria";
+import { EstadoItem } from "../enums/estado_item";
 import { ErrorItemPedidoEstadoIncorrecto } from "../excepciones/pedido/error_item_pedido_estado";
 import { Item } from "../menu/item";
 
 export class ItemPedido {
 
     private item: Item;
-    private estado: ESTADO_ITEM;
+    private estado: EstadoItem;
 
     public constructor (itemC: Item) {
         this.item = itemC;
-        this.estado = ESTADO_ITEM.PENDIENTE;
+        this.estado = EstadoItem.PENDIENTE;
     }
 
     public getItem(): Item {
@@ -21,31 +21,31 @@ export class ItemPedido {
         return this.item.getNombre();
     }
 
-    public getCategoria(): CATEGORIA {
+    public getCategoria(): Categoria {
         return this.item.getCategoria();
     }
 
-    public getEstado(): ESTADO_ITEM {
+    public getEstado(): EstadoItem {
         return this.estado;
     }
 
     public estaListo(): boolean {
-        return this.estado === ESTADO_ITEM.LISTO;
+        return this.estado === EstadoItem.LISTO;
     }
 
     public iniciarPreparacion(): void {
-        if (this.estado !== ESTADO_ITEM.PENDIENTE) {
-            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), ESTADO_ITEM.PENDIENTE);
+        if (this.estado !== EstadoItem.PENDIENTE) {
+            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), EstadoItem.PENDIENTE);
         }
 
-        this.estado = ESTADO_ITEM.EN_PREPARACION;
+        this.estado = EstadoItem.EN_PREPARACION;
     }
 
     public marcarListo(): void {
-        if (this.estado !== ESTADO_ITEM.EN_PREPARACION) {
-            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), ESTADO_ITEM.EN_PREPARACION);
+        if (this.estado !== EstadoItem.EN_PREPARACION) {
+            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), EstadoItem.EN_PREPARACION);
         }
 
-        this.estado = ESTADO_ITEM.LISTO;
+        this.estado = EstadoItem.LISTO;
     }
 }

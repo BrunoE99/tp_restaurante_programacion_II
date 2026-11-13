@@ -1,9 +1,9 @@
-import { ESTADO_ITEM } from "../../enums/estado_item";
+import { EstadoItem } from "../../enums/estado_item";
 
 export class ErrorItemPedidoEstadoIncorrecto extends Error {
 
-    public constructor(itemNombre: string, estadoEsperado: ESTADO_ITEM) {
-        super(`El item ${itemNombre} no se encuentra en el estado: ${ESTADO_ITEM[estadoEsperado]}`);
+    public constructor(itemNombre: string, estadoEsperado: EstadoItem) {
+        super(`El item ${itemNombre} no se encuentra en el estado: ${EstadoItem[estadoEsperado]}`);
         this.name = "ErrorItemPedidoEstadoIncorrecto";
     }
 

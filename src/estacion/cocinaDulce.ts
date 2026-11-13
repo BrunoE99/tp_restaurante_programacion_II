@@ -1,10 +1,10 @@
 import Estacion from "./estacion";
-import { CATEGORIA } from "../enums/categoria";
+import { Categoria } from "../enums/categoria";
 
 export default class CocinaDulce extends Estacion {
 
     public constructor() {
-        super('Cocina dulce', [CATEGORIA.POSTRE]);
+        super('Cocina dulce', [Categoria.POSTRE]);
     }
 
 }
