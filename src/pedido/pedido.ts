@@ -10,12 +10,14 @@ import { ErrorPedidoYaFacturado } from "../excepciones/pedido/error_pedido_ya_fa
 import { ErrorPedidoSinProductos } from "../excepciones/pedido/error_pedido_sin_productos";
 import { ErrorPedidoItemsNoListos } from "../excepciones/pedido/error_pedido_items_no_listos";
 import { ErrorPedidoNoExisteMedioDePago } from "../excepciones/pedido/error_pedido_no_existe_medio_pago";
+import { ErrorPedidoSinAccionesParaDeshacer } from "../excepciones/pedido/error_pedido_sinAccionesParaDeshacer";
 
 export abstract class Pedido { 
 
     private readonly numeroDePedido: number;
     private cliente: Cliente;
     private productos: Producto[];
+    private historial: Producto[][];
     private precioTotal: number;
     private medioDePago: IMediosDePago | undefined;
     private estadoDelPedido: EstadoPedido;
@@ -26,6 +28,7 @@ export abstract class Pedido {
         this.numeroDePedido = numero;
         this.cliente = client;
         this.productos = [];
+        this.historial = [];
         this.itemsPedidos = [];
         this.precioTotal = 0;
         this.medioDePago = mediosDePago;
@@ -70,9 +73,16 @@ export abstract class Pedido {
 
     }
 
+    private guardarEstado(): void {
+         
+        this.historial.push([...this.productos]);
+
+    }
+
     public agregarProducto(producto: Producto): void {
 
         this.validarPedidoEnConstruccion();
+        this.guardarEstado();   
         this.productos.push(producto);
         this.calcularPrecio();
 
@@ -82,6 +92,8 @@ export abstract class Pedido {
 
         this.validarPedidoEnConstruccion();
 
+        this.guardarEstado();
+
         const posicion: number = this.productos.indexOf(producto);
 
         if (posicion >= 0) {
@@ -89,6 +101,18 @@ export abstract class Pedido {
         }
 
         this.calcularPrecio();
+    }
+
+    public deshacerUltimaAccion(): void {
+
+        this.validarPedidoEnConstruccion();
+
+        if (this.historial.length > 0) {
+            this.productos = this.historial.pop()!;
+            this.calcularPrecio();
+        } else {
+            throw new ErrorPedidoSinAccionesParaDeshacer(this.numeroDePedido);
+        }
     }
 
     protected calcularPrecio(): void {
