@@ -4,6 +4,7 @@ import { Pedido } from "./pedido";
 import Producto from "../menu/producto";
 import { NumeradorPedidos } from "./numerador_pedidos";
 import { FabricaPedido } from "./fabrica/fabrica_pedido";
+import { ErrorPedidoNoExiste } from "../excepciones/pedido/error_pedido_no_existe";
 
 export class GestorPedidos {
 
@@ -46,7 +47,7 @@ export class GestorPedidos {
         const pedidoConsultado = this.historialDePedidos.get(numPedido);
 
         if (pedidoConsultado === undefined) {
-            throw new Error("No existe el pedido");
+            throw new ErrorPedidoNoExiste(numPedido);
         }
 
         return pedidoConsultado;
@@ -75,11 +76,11 @@ export class GestorPedidos {
         this.pedidosEnCurso.delete(numero);
     }
 
-    private buscarPedidoEnCurso(numero: number): Pedido {
-        const pedido = this.pedidosEnCurso.get(numero);
+    private buscarPedidoEnCurso(numPedido: number): Pedido {
+        const pedido = this.pedidosEnCurso.get(numPedido);
 
         if (pedido === undefined) {
-            throw new Error(`No existe un pedido en curso con numero ${numero}`);
+            throw new ErrorPedidoNoExiste(numPedido);
         }
 
         return pedido;

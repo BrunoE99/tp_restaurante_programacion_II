@@ -1,4 +1,7 @@
 import { CATEGORIA } from "../enums/categoria";
+import { ErrorEstacionItemNoEnPreparacion } from "../excepciones/estacion/error_estacion_item_no_en_preparacion";
+import { ErrorEstacionNoEncontrada } from "../excepciones/estacion/error_estacion_no_encontrada";
+import { ErrorEstacionSinItems } from "../excepciones/estacion/error_estacion_sin_items";
 import { ItemPedido } from "../pedido/item_pedido";
 
 export default abstract class Estacion {
@@ -7,8 +10,10 @@ export default abstract class Estacion {
     private items: ItemPedido[];
     private itemsEnPreparacion: ItemPedido[];
     private categorias: CATEGORIA[];
+    private readonly nombre: string;
 
-    public constructor (categorias: CATEGORIA[]) {
+    public constructor (nombre: string, categorias: CATEGORIA[]) {
+        this.nombre = nombre;
         this.siguiente = undefined;
         this.items = [];
         this.itemsEnPreparacion = [];
@@ -26,7 +31,7 @@ export default abstract class Estacion {
         }
 
         if (this.siguiente === undefined) {
-            throw new Error (`Ninguna estacion puede preparar: ${item.getNombre()}`);
+            throw new ErrorEstacionNoEncontrada(item.getNombre(), item.getCategoria());
         }
 
         this.siguiente.recibir(item);
@@ -36,7 +41,7 @@ export default abstract class Estacion {
         const item = this.items.shift();
 
         if (item === undefined) {
-            throw new Error ("No hay items en la cola de la estacion.");
+            throw new ErrorEstacionSinItems(this.nombre);
         }
 
         item.iniciarPreparacion();
@@ -49,7 +54,7 @@ export default abstract class Estacion {
         const posicion = this.itemsEnPreparacion.indexOf(item);
 
         if (posicion < 0) {
-            throw new Error("El item no esta en preparacion en esta estacion.");
+            throw new ErrorEstacionItemNoEnPreparacion(item.getNombre(), this.nombre);
         }
 
         item.marcarListo();

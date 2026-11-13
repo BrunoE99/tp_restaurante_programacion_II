@@ -1,5 +1,6 @@
 import { CATEGORIA } from "../enums/categoria";
 import { ESTADO_ITEM } from "../enums/estado_item";
+import { ErrorItemPedidoEstadoIncorrecto } from "../excepciones/pedido/error_item_pedido_estado";
 import { Item } from "../menu/item";
 
 export class ItemPedido {
@@ -34,7 +35,7 @@ export class ItemPedido {
 
     public iniciarPreparacion(): void {
         if (this.estado !== ESTADO_ITEM.PENDIENTE) {
-            throw new Error (`${this.getNombre()} no esta pendiente.`);
+            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), ESTADO_ITEM.PENDIENTE);
         }
 
         this.estado = ESTADO_ITEM.EN_PREPARACION;
@@ -42,7 +43,7 @@ export class ItemPedido {
 
     public marcarListo(): void {
         if (this.estado !== ESTADO_ITEM.EN_PREPARACION) {
-            throw new Error(`${this.getNombre()} no esta en preaparacion.`);
+            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), ESTADO_ITEM.EN_PREPARACION);
         }
 
         this.estado = ESTADO_ITEM.LISTO;

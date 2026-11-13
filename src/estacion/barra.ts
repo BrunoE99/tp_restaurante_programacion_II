@@ -4,7 +4,7 @@ import { CATEGORIA } from "../enums/categoria";
 export default class Barra extends Estacion {
 
     public constructor() {
-        super([CATEGORIA.BEBIDA]);
+        super('Barra', [CATEGORIA.BEBIDA]);
     }
 
 }

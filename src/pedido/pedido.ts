@@ -5,6 +5,11 @@ import Cliente from "../empleados-cliente/cliente";
 import { ItemPedido } from "./item_pedido";
 import Producto from "../menu/producto";
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
+import { ErrorPedidoEstadoIncorrecto } from "../excepciones/pedido/error_pedido_estado";
+import { ErrorPedidoYaFacturado } from "../excepciones/pedido/error_pedido_ya_facturado";
+import { ErrorPedidoSinProductos } from "../excepciones/pedido/error_pedido_sin_productos";
+import { ErrorPedidoItemsNoListos } from "../excepciones/pedido/error_pedido_items_no_listos";
+import { ErrorPedidoNoExisteMedioDePago } from "../excepciones/pedido/error_pedido_no_existe_medio_pago";
 
 export abstract class Pedido { 
 
@@ -99,7 +104,7 @@ export abstract class Pedido {
         this.validarPedidoEnConstruccion();
 
         if (this.productos.length === 0) {
-            throw new Error("El pedido no tiene items ni combos a confirmar");
+            throw new ErrorPedidoSinProductos(this.numeroDePedido);
         }
 
         this.itemsPedidos = [];
@@ -115,25 +120,25 @@ export abstract class Pedido {
 
     private validarPedidoEnConstruccion(): void {
         if (this.estadoDelPedido !== ESTADO_PEDIDO.EN_CONSTRUCCION) {
-            throw new Error("El pedido no esta en construccion");
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, ESTADO_PEDIDO.EN_CONSTRUCCION);
         }
     }
 
     private validarPedidoNoFacturado(): void {
         if (this.estadoDelPedido === ESTADO_PEDIDO.FACTURADO) {
-            throw new Error("El pedido esta facturado, no se puede cambiar el metodo de pago.");
+            throw new ErrorPedidoYaFacturado(this.numeroDePedido);
         }
     }
 
     public facturarPedido(): void {
         if (this.estadoDelPedido !== ESTADO_PEDIDO.CONFIRMADO) {
-            throw new Error("El pedido no se encuentra confirmado.");
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, ESTADO_PEDIDO.CONFIRMADO);
         }
         if (!this.todosItemsListos()) {
-            throw new Error("Los items y/o combos no estan listos.")
+            throw new ErrorPedidoItemsNoListos(this.numeroDePedido);
         }
         if (this.medioDePago === undefined) {
-            throw new Error("No existe el medio de pago");
+            throw new ErrorPedidoNoExisteMedioDePago(this.numeroDePedido);
         }
 
         this.estadoDelPedido = ESTADO_PEDIDO.FACTURADO;
