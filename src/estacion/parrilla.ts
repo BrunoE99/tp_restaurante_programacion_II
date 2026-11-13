@@ -1,18 +1,10 @@
 import Estacion from "./estacion";
-import { ESTADO_ITEM } from "../enums/estado_item";
+import { Categoria } from "../enums/categoria";
 
 export default class Parrilla extends Estacion {
 
-    public preparar(item: Item): Item {
-        if (this.itemValido(item, "CARNE") == false) {
-            return null;
-        } else {
-            item.estado = ESTADO_ITEM.EN_PREPARACION;
-            console.log("item en preparacion en la parrilla");
-            item.estado = ESTADO_ITEM.LISTO;
-            console.log("item listo en la parrilla");
-            return item;
-        }
+    public constructor() {
+        super('Parrilla', [Categoria.CARNE]);
     }
 
 }

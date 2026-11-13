@@ -1,29 +1,40 @@
 import IMediosDePago from "../medios_de_pago/iMediosDePago";
 import Estacion from "../estacion/estacion";
 import { Pedido } from "./pedido";
+import Producto from "../menu/producto";
+import { NumeradorPedidos } from "./numerador_pedidos";
+import { FabricaPedido } from "./fabrica/fabrica_pedido";
+import { ErrorPedidoNoExiste } from "../excepciones/pedido/error_pedido_no_existe";
 
 export class GestorPedidos {
 
-    private pedido: Pedido;
+    private pedidosEnCurso: Map<number, Pedido>;
     private historialDePedidos: Map<number, Pedido>;
-    private estaciones: Estacion[];
+    private primeraEstacion: Estacion;
+    private numerador: NumeradorPedidos;
 
-    public constructor(pedid: Pedido, estacionesParam: Estacion[]) {
-        this.pedido = pedid;
+    public constructor(primeraEstacion: Estacion) {
+        this.pedidosEnCurso = new Map<number, Pedido>();
         this.historialDePedidos = new Map<number, Pedido>();
-        this.estaciones = estacionesParam;
+        this.primeraEstacion = primeraEstacion;
+        this.numerador = new NumeradorPedidos();
     }
 
-    public getPedido(): Pedido {
-        return this.pedido;
+    public registrarPedido(fabrica: FabricaPedido): number {
+        const numero = this.numerador.siguienteNumero();
+        const pedido = fabrica.crearPedido(numero);
+
+        this.pedidosEnCurso.set(numero, pedido);
+
+        return numero;
     }
 
-    public setPedido(pedid: Pedido): void {
-        this.pedido = pedid;
+    public getPedidoEnCurso(numero: number): Pedido {
+        return this.buscarPedidoEnCurso(numero);
     }
 
-    public pedidoPago(medioPago: IMediosDePago): void {
-        this.pedido.setMedioDePago(medioPago);
+    public pedidoPago(numero: number, medioPago: IMediosDePago): void {
+        this.buscarPedidoEnCurso(numero).setMedioDePago(medioPago);
     }
 
     public getHistorial(): Pedido[] {
@@ -36,40 +47,49 @@ export class GestorPedidos {
         const pedidoConsultado = this.historialDePedidos.get(numPedido);
 
         if (pedidoConsultado === undefined) {
-            throw new Error("No existe el pedido");
+            throw new ErrorPedidoNoExiste(numPedido);
         }
 
         return pedidoConsultado;
     }
 
-    public agregarItem(item: Item): void {
-        this.pedido.agregarItem(item);
+    public agregarProducto(numero: number, producto: Producto): void {
+        this.buscarPedidoEnCurso(numero).agregarProducto(producto);
     }
 
-    public eliminarItem(item: Item): void {
-        this.pedido.eliminarItem(item);
+    public eliminarProducto(numero: number, producto: Producto): void {
+        this.buscarPedidoEnCurso(numero).eliminarProducto(producto);
     }
 
-    public agregarCombo(combo: Combo): void {
-        this.pedido.agregarCombo(combo);
+    public confirmarPedido(numero: number): void {
+        const pedido = this.buscarPedidoEnCurso(numero);
+
+        pedido.confirmarPedido();
+        this.asignarAEstaciones(pedido);
     }
 
-    public eliminarCombo(combo: Combo): void {
-        this.pedido.eliminarCombo(combo);
+    public facturarPedido(numero: number): void {
+        const pedido = this.buscarPedidoEnCurso(numero);
+
+        pedido.facturarPedido();
+        this.historialDePedidos.set(numero, pedido);
+        this.pedidosEnCurso.delete(numero);
     }
 
-    public confirmarPedido(): void {
-        this.pedido.confirmarPedido();
-        this.asignarAEstaciones();
+    private buscarPedidoEnCurso(numPedido: number): Pedido {
+        const pedido = this.pedidosEnCurso.get(numPedido);
+
+        if (pedido === undefined) {
+            throw new ErrorPedidoNoExiste(numPedido);
+        }
+
+        return pedido;
     }
 
-    public facturarPedido(): void {
-        this.pedido.facturarPedido();
-        this.historialDePedidos.set(this.pedido.getNumeroDePedido(), this.pedido);
-    }
-
-    public asignarAEstaciones(): void {
-        // envia cada item a su estacion designada. probablemente llama a dentro de Pedido.
+    private asignarAEstaciones(pedido: Pedido): void {
+        for (const item of pedido.getItemsAPreparar()) {
+            this.primeraEstacion.recibir(item);
+        }
     }
 
 }

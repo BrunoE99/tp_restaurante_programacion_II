@@ -1,55 +1,56 @@
-import { DIA_SEMANA } from "../enums/dia_semana"
-import { ESTADO_ITEM } from "../enums/estado_item";
-import { ESTADO_PEDIDO } from "../enums/estado_pedido"
+import { DiaSemana } from "../enums/dia_semana"
+import { EstadoPedido } from "../enums/estado_pedido"
 import { CalculoDia } from "../calculo_dia/dia_actual"
+import Cliente from "../empleados-cliente/cliente";
+import { ItemPedido } from "./item_pedido";
+import Producto from "../menu/producto";
+import IMediosDePago from "../medios_de_pago/iMediosDePago";
+import { ErrorPedidoEstadoIncorrecto } from "../excepciones/pedido/error_pedido_estado";
+import { ErrorPedidoYaFacturado } from "../excepciones/pedido/error_pedido_ya_facturado";
+import { ErrorPedidoSinProductos } from "../excepciones/pedido/error_pedido_sin_productos";
+import { ErrorPedidoItemsNoListos } from "../excepciones/pedido/error_pedido_items_no_listos";
+import { ErrorPedidoNoExisteMedioDePago } from "../excepciones/pedido/error_pedido_no_existe_medio_pago";
 
 export abstract class Pedido { 
 
-    private numeroDePedido: number;
+    private readonly numeroDePedido: number;
     private cliente: Cliente;
-    private items: Item[];
-    private combos: Combo[];
+    private productos: Producto[];
     private precioTotal: number;
-    private medioDePago: MediosDePago | undefined;
-    private estadoDelPedido: ESTADO_PEDIDO;
-    private diaActual: DIA_SEMANA;
+    private medioDePago: IMediosDePago | undefined;
+    private estadoDelPedido: EstadoPedido;
+    private diaActual: DiaSemana;
+    private itemsPedidos: ItemPedido[];
 
-    public constructor(client: Cliente, diaSem: CalculoDia, mediosDePago?: MediosDePago) {
-        this.numeroDePedido = 0;
+    public constructor(numero: number, client: Cliente, diaSem: CalculoDia, mediosDePago?: IMediosDePago) {
+        this.numeroDePedido = numero;
         this.cliente = client;
-        this.items = [];
-        this.combos = [];
+        this.productos = [];
+        this.itemsPedidos = [];
         this.precioTotal = 0;
         this.medioDePago = mediosDePago;
-        this.estadoDelPedido = ESTADO_PEDIDO.EN_CONSTRUCCION;
+        this.estadoDelPedido = EstadoPedido.EN_CONSTRUCCION;
         this.diaActual = diaSem.calculoDia();
-    }
-    
-    protected abstract pedir(): void;
-
-    protected abstract entregar(): void;
-
-    protected setNumeroDePedido(numero: number): void {
-        this.numeroDePedido = numero;
     }
 
     public getNumeroDePedido(): number {
         return this.numeroDePedido;
     }
 
-    public getMedioDePago(): MediosDePago | undefined {
+    public getMedioDePago(): IMediosDePago | undefined {
         return this.medioDePago;
     }
 
-    public setMedioDePago(medioPago: MediosDePago): void {
+    public setMedioDePago(medioPago: IMediosDePago): void {
+        this.validarPedidoNoFacturado();
         this.medioDePago = medioPago;
     }
 
-    public getEstadoPedido(): ESTADO_PEDIDO {
+    public getEstadoPedido(): EstadoPedido {
         return this.estadoDelPedido;
     }
 
-    public getDiaActual(): DIA_SEMANA {
+    public getDiaActual(): DiaSemana {
         return this.diaActual;
     }
 
@@ -57,91 +58,90 @@ export abstract class Pedido {
         return this.precioTotal;
     }
     
-    public estadoItems(): ESTADO_ITEM {
+    public todosItemsListos(): boolean {
 
-        if (this.items.length === 0 && this.combos.length === 0) {
-            return ESTADO_ITEM.PENDIENTE;
-        }
+        return this.itemsPedidos.length > 0 && this.itemsPedidos.every(itemPedido => itemPedido.estaListo());
 
-        const estadosItems = this.items.map(item => item.getEstadoItem());
-        const estadosCombos = this.combos.map(combo => combo.getEstadoCombo());
-
-        return Math.min(...estadosItems, ...estadosCombos) as ESTADO_ITEM;
     }
 
-    public agregarItem(item: Item): void {
+    public getItemsAPreparar(): ItemPedido[] {
+
+        return [...this.itemsPedidos];
+
+    }
+
+    public agregarProducto(producto: Producto): void {
+
         this.validarPedidoEnConstruccion();
-        this.items.push(item);
+        this.productos.push(producto);
         this.calcularPrecio();
+
     }
 
-    public eliminarItem(item: Item): void {
+    public eliminarProducto(producto: Producto): void {
+
         this.validarPedidoEnConstruccion();
-        const posicion: number = this.items.findIndex((itemArray) => itemArray === item);
+
+        const posicion: number = this.productos.indexOf(producto);
 
         if (posicion >= 0) {
-            this.items.splice(posicion, 1);
-        }
-
-        this.calcularPrecio();
-    }
-
-    public agregarCombo(combo: Combo): void {
-        this.validarPedidoEnConstruccion();
-        this.combos.push(combo);
-        this.calcularPrecio();
-    }
-
-    public eliminarCombo(combo: Combo): void {
-        this.validarPedidoEnConstruccion();
-        const posicion: number = this.combos.findIndex((comboArray) => comboArray === combo);
-
-        if (posicion >= 0) {
-            this.combos.splice(posicion, 1);
+            this.productos.splice(posicion, 1);
         }
 
         this.calcularPrecio();
     }
 
     protected calcularPrecio(): void {
-        const valorInicialItems = 0;
-        const precioItems: number = this.items.reduce((acumulador, valorAct) => acumulador + 
-        valorAct.getPrecioIndividual(), valorInicialItems);
 
-        const valorInicialCombos = 0;
-        const precioCombos: number = this.combos.reduce((acumulador, valorAct) => acumulador + 
-        valorAct.getPrecioCombo(), valorInicialCombos);
+        const valorInicial = 0;
 
-        this.precioTotal = precioItems + precioCombos;
+        this.precioTotal = this.productos.reduce((acumulador, producto) => 
+            acumulador + producto.getPrecio(), valorInicial);
     }
 
     public confirmarPedido(): void {
+
         this.validarPedidoEnConstruccion();
-        if (this.items.length === 0 && this.combos.length === 0) {
-            throw new Error("El pedido no tiene items ni combos a confirmar");
+
+        if (this.productos.length === 0) {
+            throw new ErrorPedidoSinProductos(this.numeroDePedido);
         }
 
-        this.estadoDelPedido = ESTADO_PEDIDO.CONFIRMADO;
+        this.itemsPedidos = [];
+
+        for (const producto of this.productos) {
+            for (const item of producto.getItems()) {
+                this.itemsPedidos.push(new ItemPedido(item, this.numeroDePedido));
+            }
+        }
+
+        this.estadoDelPedido = EstadoPedido.CONFIRMADO;
     }
 
     private validarPedidoEnConstruccion(): void {
-        if (this.estadoDelPedido !== ESTADO_PEDIDO.EN_CONSTRUCCION) {
-            throw new Error("El pedido no esta en construccion");
+        if (this.estadoDelPedido !== EstadoPedido.EN_CONSTRUCCION) {
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, EstadoPedido.EN_CONSTRUCCION);
+        }
+    }
+
+    private validarPedidoNoFacturado(): void {
+        if (this.estadoDelPedido === EstadoPedido.FACTURADO) {
+            throw new ErrorPedidoYaFacturado(this.numeroDePedido);
         }
     }
 
     public facturarPedido(): void {
-        if (this.estadoDelPedido !== ESTADO_PEDIDO.CONFIRMADO) {
-            throw new Error("El pedido no se encuentra confirmado.");
+        if (this.estadoDelPedido !== EstadoPedido.CONFIRMADO) {
+            throw new ErrorPedidoEstadoIncorrecto(this.numeroDePedido, EstadoPedido.CONFIRMADO);
         }
-        if (this.estadoItems() !== ESTADO_ITEM.LISTO) {
-            throw new Error("Los items y/o combos no estan listos.")
+        if (!this.todosItemsListos()) {
+            throw new ErrorPedidoItemsNoListos(this.numeroDePedido);
         }
         if (this.medioDePago === undefined) {
-            throw new Error("No existe el medio de pago");
+            throw new ErrorPedidoNoExisteMedioDePago(this.numeroDePedido);
         }
 
-        this.estadoDelPedido = ESTADO_PEDIDO.FACTURADO;
+        this.estadoDelPedido = EstadoPedido.FACTURADO;
     }
 
 }

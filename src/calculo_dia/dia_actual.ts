@@ -1,4 +1,4 @@
-import { DIA_SEMANA } from "../enums/dia_semana";
+import { DiaSemana } from "../enums/dia_semana";
 
 export class CalculoDia {
 
@@ -8,7 +8,7 @@ export class CalculoDia {
         this.fecha = fechaHoy ?? new Date();
     }
 
-    public calculoDia(): DIA_SEMANA {
+    public calculoDia(): DiaSemana {
         const numeroDia = this.fecha.getDay();
         return numeroDia;
     }

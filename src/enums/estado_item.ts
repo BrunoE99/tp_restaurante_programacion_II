@@ -1,4 +1,4 @@
-export enum ESTADO_ITEM {
+export enum EstadoItem {
     PENDIENTE,
     EN_PREPARACION,
     LISTO

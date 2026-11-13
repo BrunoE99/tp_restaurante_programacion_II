@@ -1,17 +1,20 @@
 import { Beneficio } from "../beneficio/Beneficio";
+import { ErrorComboMinimoItems } from "../excepciones/menu/error_combo_minimo_items";
 import { Item } from "./item";
 import Producto from "./producto";
 
 export class Combo implements Producto {
+    private readonly minimoItems = 2;
+
     private nombre: string;
     private items: Item[];
     private beneficio: Beneficio;
 
     public constructor(nombre: string, items: Item[], beneficio: Beneficio) {
-        // Hay que matar un panda para que no se acepte < 2 items y, en caso negativo (se mande < 2) lanzar un error
-        if (items.length < 2) {
-            throw new Error("El minimo de items para un combo son 2");
+        if (items.length < this.minimoItems) {
+            throw new ErrorComboMinimoItems(nombre, this.minimoItems);
         }
+
         this.nombre = nombre;
         this.items = items;
         this.beneficio = beneficio;
@@ -22,7 +25,7 @@ export class Combo implements Producto {
     }
 
     public getItems(): Item[] {
-        return this.items;
+        return [...this.items];
     }
 
     private getPrecioTotalItems(): number {
@@ -33,6 +36,5 @@ export class Combo implements Producto {
     public getPrecio(): number {
         return this.beneficio.calcularBeneficio(this.getPrecioTotalItems());
     }
-
-
+    
 }

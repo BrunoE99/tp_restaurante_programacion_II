@@ -1,5 +1,6 @@
 import MediosDePago from './iMediosDePago';
 import AbstractTarjeta from './abstractTarjeta';
+
 export default class TarjetaCredito extends AbstractTarjeta {
     public constructor(
         medioDePago: MediosDePago,

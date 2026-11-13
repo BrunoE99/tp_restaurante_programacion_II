@@ -1,12 +1,12 @@
-import { CATEGORIA } from "../enums/categoria"
+import { Categoria } from "../enums/categoria"
 import Producto from "./producto";
 
 export class Item implements Producto {
     private nombre: string;
     private precio: number;
-    private categoria: CATEGORIA;
+    private categoria: Categoria;
 
-    public constructor(nombre: string, precio: number, categoria: CATEGORIA) {
+    public constructor(nombre: string, precio: number, categoria: Categoria) {
         this.nombre = nombre;
         this.precio = precio;
         this.categoria = categoria;
@@ -20,7 +20,11 @@ export class Item implements Producto {
         return this.precio;
     }
 
-    public getCategoria(): CATEGORIA {
+    public getCategoria(): Categoria {
         return this.categoria;
+    }
+
+    public getItems(): Item[] {
+        return [this];
     }
 }
