@@ -111,7 +111,7 @@ export abstract class Pedido {
 
         for (const producto of this.productos) {
             for (const item of producto.getItems()) {
-                this.itemsPedidos.push(new ItemPedido(item));
+                this.itemsPedidos.push(new ItemPedido(item, this.numeroDePedido));
             }
         }
 

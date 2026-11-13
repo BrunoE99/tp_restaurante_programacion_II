@@ -20,6 +20,10 @@ export default abstract class Estacion {
         this.categorias = categorias;
     }
 
+    public getNombre(): string {
+        return this.nombre;
+    }
+
     public setSiguiente(estacion: Estacion): void {
         this.siguiente = estacion;
     }
@@ -35,6 +39,10 @@ export default abstract class Estacion {
         }
 
         this.siguiente.recibir(item);
+    }
+
+    public tieneItemsEnCola(): boolean {
+        return this.items.length > 0;
     }
 
     public iniciarSiguiente(): ItemPedido {

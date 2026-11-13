@@ -7,10 +7,12 @@ export class ItemPedido {
 
     private item: Item;
     private estado: EstadoItem;
+    private readonly numeroPedido: number;
 
-    public constructor (itemC: Item) {
+    public constructor (itemC: Item, numeroPedido: number) {
         this.item = itemC;
         this.estado = EstadoItem.PENDIENTE;
+        this.numeroPedido = numeroPedido;
     }
 
     public getItem(): Item {
@@ -29,13 +31,17 @@ export class ItemPedido {
         return this.estado;
     }
 
+    public getNumeroPedido(): number {
+        return this.numeroPedido;
+    }
+
     public estaListo(): boolean {
         return this.estado === EstadoItem.LISTO;
     }
 
     public iniciarPreparacion(): void {
         if (this.estado !== EstadoItem.PENDIENTE) {
-            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), EstadoItem.PENDIENTE);
+            throw new ErrorItemPedidoEstadoIncorrecto(this.numeroPedido, this.getNombre(), EstadoItem.PENDIENTE);
         }
 
         this.estado = EstadoItem.EN_PREPARACION;
@@ -43,7 +49,7 @@ export class ItemPedido {
 
     public marcarListo(): void {
         if (this.estado !== EstadoItem.EN_PREPARACION) {
-            throw new ErrorItemPedidoEstadoIncorrecto(this.getNombre(), EstadoItem.EN_PREPARACION);
+            throw new ErrorItemPedidoEstadoIncorrecto(this.numeroPedido, this.getNombre(), EstadoItem.EN_PREPARACION);
         }
 
         this.estado = EstadoItem.LISTO;
