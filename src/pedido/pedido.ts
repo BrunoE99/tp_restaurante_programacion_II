@@ -10,7 +10,7 @@ import { ErrorPedidoYaFacturado } from "../excepciones/pedido/error_pedido_ya_fa
 import { ErrorPedidoSinProductos } from "../excepciones/pedido/error_pedido_sin_productos";
 import { ErrorPedidoItemsNoListos } from "../excepciones/pedido/error_pedido_items_no_listos";
 import { ErrorPedidoNoExisteMedioDePago } from "../excepciones/pedido/error_pedido_no_existe_medio_pago";
-import { ErrorPedidoSinAccionesParaDeshacer } from "../excepciones/pedido/error_pedido_sinAccionesParaDeshacer";
+import { ErrorPedidoSinAccionesParaDeshacer } from "../excepciones/pedido/error_pedido_sin_acciones_para_deshacer";
 
 export abstract class Pedido { 
 
