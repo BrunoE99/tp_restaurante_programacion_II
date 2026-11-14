@@ -1,5 +1,3 @@
-import iMedioDePago from "../medios_de_pago/iMediosDePago";
-
 export default class Cliente {
     private mesaAsignada: number;
 
@@ -14,10 +12,4 @@ export default class Cliente {
     public setMesaAsignada(mesaAsignada: number): void {
         this.mesaAsignada = mesaAsignada;
     }
-
-    public pagarPedido(medioDePago: iMedioDePago): void {
-        medioDePago.pagoCompletado();
-    }
-
-    public pedirPedido(): void {}
 }

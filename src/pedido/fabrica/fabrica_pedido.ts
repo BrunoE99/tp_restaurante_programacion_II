@@ -3,7 +3,8 @@ import { Pedido } from "../pedido";
 /**
  * Interfaz que define el contrato del patron Factory Method para la creacion de Pedidos.
  * 
- * Cada fabrica recibe en su constructor los datos de su modalidad, haciendo que el {@link pedido/gestor_pedidos!GestorPedidos}
+ * Cada fabrica recibe en su constructor los datos de su modalidad, 
+ * haciendo que el {@link pedido/gestor_pedidos!GestorPedidos}
  * registre cualquier modalidad sin conocerla.
  */
 export interface FabricaPedido {

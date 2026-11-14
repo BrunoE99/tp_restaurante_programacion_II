@@ -6,6 +6,8 @@ import AbstractTarjeta from './abstractTarjeta';
  * Los datos y la regla del descuento la hereda de {@link AbstractTarjeta}.
  */
 export default class TarjetaDebito extends AbstractTarjeta {
+    private readonly mensajePago = 'Pago con tarjeta de débito completado con éxito.';
+
     /**
      * 
      * @param medioDePago Medio de pago asociado.
@@ -30,6 +32,6 @@ export default class TarjetaDebito extends AbstractTarjeta {
      * Informa por consola que el pago con tarjeta de credito se completo.
      */
     public pagoCompletado(): void {
-        console.log('Pago con tarjeta de débito completado con éxito.');
+        console.log(this.mensajePago);
     }
     }

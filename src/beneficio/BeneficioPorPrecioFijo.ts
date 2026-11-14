@@ -17,10 +17,9 @@ export class BeneficioPorPrecioFijo implements Beneficio {
     /**
      * Devuelve el precio fijo, ignorando la suma de los productos.
      * 
-     * @param sumaDeProductos Suma de los productos individuales (no se usa).
      * @returns El precio fijo del combo.
      */
-    public calcularBeneficio(sumaDeProductos: number): number {
+    public calcularBeneficio(): number {
         return this.precioFijo;
     }
 

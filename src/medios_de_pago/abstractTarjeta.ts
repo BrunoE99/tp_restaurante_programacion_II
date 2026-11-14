@@ -13,6 +13,7 @@ export default abstract class AbstractTarjeta implements MediosDePago {
     private codigoSeguridad: string;
     private fechaVencimiento: string;
     private saldo: number;
+    private readonly calificaDescuentoEfectivo = false;
 
     /**
      * @param medioDePago Medio de pago asociado.
@@ -47,7 +48,7 @@ export default abstract class AbstractTarjeta implements MediosDePago {
      * @returns Siempre `false`, los pagos con tarjeta no aplican para el descuento en efectivo.
      */
     public aplicaDescuentoEfectivo(): boolean {
-        return false;
+        return this.calificaDescuentoEfectivo;
     }
 
 }

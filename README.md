@@ -1,268 +1,140 @@
-# 🍽️ Fogón del Barrio — Gestión de Pedidos
+# Fogón del Barrio - Gestión de Pedidos
 
-Trabajo práctico de **Programación II** (Grupo 5).
+Trabajo práctico de Programación II, Grupo 5.
 
-Sistema en TypeScript que digitaliza la gestión de pedidos del restaurante "Fogón del Barrio". Cubre todo el recorrido de un pedido:
+Sistema en TypeScript para el restaurante "Fogón del Barrio". El sistema:
 
-1. El cliente lo realiza.
-2. La cocina lo prepara, repartido entre sus estaciones.
-3. Se genera la cuenta con el mejor descuento disponible.
-4. Queda guardado en el historial.
+- toma pedidos en salón, para retirar y con envío;
+- reparte los ítems entre las estaciones de la cocina;
+- arma la cuenta aplicando el mejor descuento disponible;
+- guarda el historial de lo cobrado.
 
 ## Integrantes
 
 | Nombre | Usuario de GitHub |
 |---|---|
-| Bruno Enrigo | juanfdamelio |
-| Juan Francisco Damelio | BrunoE99 |
+| Bruno Enrigo | BrunoE99 |
+| Juan Francisco Damelio | juanfdamelio |
 
----
+## Instalación y ejecución
 
-## Tabla de contenidos
-
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Compilación y ejecución](#compilación-y-ejecución)
-- [Pruebas y cobertura](#pruebas-y-cobertura)
-- [Estilo de código (ESLint)](#estilo-de-código-eslint)
-- [Documentación del código (JSDoc)](#documentación-del-código-jsdoc)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Funcionamiento](#funcionamiento)
-- [Requerimientos funcionales](#requerimientos-funcionales)
-- [Patrones de diseño](#patrones-de-diseño)
-- [Manejo de errores](#manejo-de-errores)
-- [Diagramas](#diagramas)
-
----
-
-## Requisitos
-
-- [Node.js](https://nodejs.org/) en una versión LTS (incluye `npm`).
-- Opcional: Visual Studio Code con las extensiones ESLint, Jest y PlantUML.
-
-## Instalación
-
-Desde la carpeta del proyecto:
+Hace falta Node.js (versión LTS). Desde la carpeta del proyecto:
 
 ```bash
-npm install
+npm install          # instala las dependencias
+npm run dev-mode     # ejecuta la demo (src/index.ts) sin compilar
+npm run build        # corre ESLint y compila a dist/
+npm start            # ejecuta la versión compilada
+npm test             # compila y corre las pruebas
+npx jest --coverage  # corre las pruebas con reporte de cobertura (coverage/)
+npx typedoc          # genera la documentación JSDoc en docs/
 ```
 
-## Compilación y ejecución
+La demo registra tres pedidos, uno de cada modalidad:
 
-| Comando | Qué hace |
-|---|---|
-| `npm run dev-mode` | Ejecuta `src/index.ts` directamente con `ts-node`, sin compilar. Es la forma más rápida de ver la demo. |
-| `npm run build` | Limpia `dist/`, corre ESLint y compila con `tsc`. **Falla si hay errores de lint.** |
-| `npm start` | Ejecuta la versión compilada (`dist/index.js`). Requiere `npm run build` antes. |
-| `npm run start:dev` | `build` + `start` en un solo paso. |
+1. Los confirma.
+2. Hace que cada estación prepare sus ítems.
+3. Los factura.
+4. Muestra el historial con la factura de cada uno.
 
-### Qué muestra la demo
+Las pruebas usan Jest y están en `tests/`. La cobertura supera el 80 %.
 
-`src/index.ts` arma el menú y registra 3 pedidos, uno por modalidad:
-
-| Pedido | Modalidad | Productos | Medio de pago |
-|---|---|---|---|
-| 1 | Salón | Combo Hamburguesa y Flan | Efectivo |
-| 2 | Retiro | Combo Parrillero | Billetera virtual |
-| 3 | Envío | Ensalada César y Gaseosa | Efectivo |
-
-Después de registrarlos, la demo:
-
-1. Confirma los pedidos.
-2. Hace que cada estación prepare sus ítems en orden de llegada.
-3. Factura los pedidos.
-4. Imprime el historial con el detalle de cada factura.
-
-Esta es la salida esperada un día en que no rige el descuento por día de la semana:
+## Estructura
 
 ```text
-[Parrilla] Pedido 1: Hamburguesa
-[Parrilla] Pedido 2: Bife de chorizo
-[Barra] Pedido 1: Gaseosa
-[Barra] Pedido 2: Gaseosa
-[Barra] Pedido 3: Gaseosa
-[Cocina fria] Pedido 1: Ensalada cesar
-[Cocina fria] Pedido 3: Ensalada cesar
-[Cocina dulce] Pedido 1: Flan
-[Cocina dulce] Pedido 2: Flan
-Historial de pedidos:
-Factura del pedido 1:
---------------------------------------------------
-Combo Hamburguesa: $7650.00
-Flan: $1800.00
---------------------------------------------------
-Subtotal: $9450.00
-Descuento: $945.00
-Total: $8505.00
-...
-```
-
-Si algo falla, el `index` atrapa los errores propios del sistema (`ErrorRestaurante`) y muestra su mensaje.
-
-## Pruebas y cobertura
-
-Las pruebas unitarias usan [Jest](https://jestjs.io/) con `ts-jest` y están en la carpeta `tests/`.
-
-```bash
-# compila (lint + tsc) y ejecuta todas las pruebas
-npm test
-
-# ejecuta solo las pruebas, sin compilar
-npx jest
-
-# ejecuta las pruebas y genera el reporte de cobertura (carpeta coverage/)
-npx jest --coverage
-```
-
-El objetivo es una cobertura **superior al 80 %**. El reporte HTML queda en `coverage/lcov-report/index.html`.
-
-## Estilo de código (ESLint)
-
-El proyecto usa la configuración de ESLint provista por la cátedra (`eslint.config.js`). Algunas de sus reglas:
-
-- `PascalCase` en clases.
-- `camelCase` en métodos y variables.
-- `UPPER_CASE` en constantes globales.
-- Nombres de al menos 4 caracteres.
-- Sin números mágicos.
-- Métodos de 40 líneas como máximo.
-
-```bash
-npm run lint       # reporta errores
-npm run lint-fix   # corrige automáticamente lo que se pueda
-```
-
-## Documentación del código (JSDoc)
-
-Todas las clases y métodos públicos están documentados con comentarios JSDoc. Cada comentario indica:
-
-- **Parámetros** (`@param`).
-- **Valor de retorno** (`@returns`).
-- **Excepciones** que puede lanzar (`@throws`), incluidas las que se propagan desde otras clases.
-- **Ejemplos de uso** (`@example`).
-
-Para generar el sitio HTML de la documentación:
-
-```bash
-npx typedoc
-```
-
-El resultado queda en `docs/`.
-
-## Estructura del proyecto
-
-```text
-├── diagramas/              Diagramas UML (PlantUML)
-├── src/
-│   ├── index.ts            Demo: punto de entrada
-│   ├── beneficio/          Beneficios de combos y descuentos sobre el pedido
-│   ├── calculo_dia/        Obtiene el día de la semana de una fecha
-│   ├── empleados-cliente/  Cliente
-│   ├── enums/              Categoria, DiaSemana, EstadoItem, EstadoPedido
-│   ├── estacion/           Estaciones de cocina y la cadena que las une
-│   ├── excepciones/        Jerarquía de errores propios (pedido/, estacion/, menu/)
-│   ├── medios_de_pago/     Efectivo, tarjetas (débito/crédito), billetera virtual
-│   ├── menu/               Menú, productos individuales (Item) y combos
-│   └── pedido/             Pedido y sus modalidades, gestor, factura, numerador
-│       └── fabrica/        Fábricas de cada modalidad de pedido
-├── tests/                  Pruebas unitarias (Jest)
-├── eslint.config.js        Reglas de estilo (provistas por la cátedra)
-├── jest.config.js
-├── tsconfig.json
-└── package.json
+diagramas/   diagrama de clases y diagramas de secuencia (PlantUML)
+src/
+  beneficio/         beneficios de combos y descuentos del pedido
+  estacion/          estaciones de cocina y la cadena que las une
+  excepciones/       errores propios del sistema
+  medios_de_pago/    efectivo, tarjetas y billetera virtual
+  menu/              menú, ítems y combos
+  pedido/            pedidos, gestor, factura y fábricas de pedidos
+  index.ts           demo
+tests/       pruebas unitarias
 ```
 
 ## Funcionamiento
 
-`GestorPedidos` es el punto de entrada del sistema: registra los pedidos y los identifica por número, los confirma y los factura.
+`GestorPedidos` es la clase desde la que se usa el sistema.
 
-### Ciclo de vida de un pedido
-
-```text
-                 agregar / quitar / deshacer
-                        ┌──────┐
-                        ▼      │
-  registrarPedido ─► EN_CONSTRUCCION ──confirmarPedido──► CONFIRMADO ──facturarPedido──► FACTURADO
-                                                              │                       (historial
-                                              los ítems van a las estaciones           + factura)
-```
-
-### Ciclo de vida de un ítem en la cocina
+**Estados del pedido.** Un pedido pasa por estos estados:
 
 ```text
-  PENDIENTE ──iniciarSiguiente──► EN_PREPARACION ──finalizar──► LISTO
+EN_CONSTRUCCION  →  CONFIRMADO  →  FACTURADO
 ```
 
-Al confirmarse, el pedido desarma cada producto (los combos también) en sus ítems. Cada ítem recorre la cadena de estaciones hasta encontrar la que prepara su categoría:
+- **En construcción:** se pueden agregar y quitar productos, y deshacer la última modificación.
+- **Al confirmarlo:** cada producto se separa en sus ítems, y los de un combo también. Desde ese momento ya no admite cambios.
+- **Para facturarlo:** todos los ítems tienen que estar listos y tiene que tener un medio de pago.
 
-| Estación | Categoría |
+**Preparación en la cocina.** Cada ítem recorre la cadena de estaciones hasta llegar a la que prepara su categoría:
+
+| Estación | Prepara |
 |---|---|
-| Parrilla | `CARNE` |
-| Barra | `BEBIDA` |
-| Cocina fría | `ENSALADA` |
-| Cocina dulce | `POSTRE` |
+| Parrilla | Carnes |
+| Barra | Bebidas |
+| Cocina fría | Ensaladas |
+| Cocina dulce | Postres |
 
-Cada estación atiende sus ítems **en el orden en que llegaron** (cola FIFO).
+Cada estación atiende los ítems en el orden en que le llegaron. Cada ítem pasa por estos estados:
 
-### Precio y descuentos
+```text
+PENDIENTE  →  EN_PREPARACION  →  LISTO
+```
 
-- **Precio del pedido**: es la suma de sus productos. El precio de un combo es la suma de sus ítems con su beneficio aplicado, que puede ser un porcentaje o un precio fijo.
-- **Total a cobrar**: es el precio menos **un solo** descuento, el más conveniente para el cliente. Los descuentos disponibles son:
-  - **Pago en efectivo**: 10 % por defecto.
-  - **Día de la semana**: lunes y 15 % por defecto. Tanto el día como el porcentaje se pueden configurar.
+**Precio y descuentos.**
 
----
+- El precio de un combo es la suma de sus ítems con su beneficio aplicado, que puede ser un porcentaje o un precio fijo.
+- Al facturar se aplica un solo descuento, el más conveniente para el cliente:
+  - Pago en efectivo: 10 % por defecto.
+  - Día de la semana: lunes, 15 % por defecto.
+
+**Errores.** Los errores propios del sistema heredan de `ErrorRestaurante`, así que se pueden atrapar todos con un único `catch`.
 
 ## Requerimientos funcionales
 
 | # | Requerimiento | Dónde se implementa |
 |---|---|---|
-| 1 | Registrar un pedido en una de las tres modalidades | `GestorPedidos.registrarPedido` y las fábricas de `pedido/fabrica/` |
+| 1 | Registrar un pedido en alguna de las tres modalidades | `GestorPedidos.registrarPedido` y las fábricas de `pedido/fabrica/` |
 | 2 | Agregar y quitar productos mientras está en construcción | `Pedido.agregarProducto` / `eliminarProducto` |
 | 3 | Deshacer la última modificación | `Pedido.deshacerUltimaAccion` |
 | 4 | Confirmar y distribuir los ítems entre las estaciones | `GestorPedidos.confirmarPedido` y `Estacion.recibir` |
-| 5 | Cada estación procesa en orden de llegada y marca el avance | `Estacion.iniciarSiguiente` / `finalizar` e `ItemPedido` |
-| 6 | Impedir modificar un ítem en preparación | `Pedido` deja de admitir cambios al confirmarse, e `ItemPedido` valida cada cambio de estado |
-| 7 | No facturar hasta que todos los ítems estén listos | `Pedido.facturarPedido` y `todosItemsListos` |
-| 8 | Calcular el precio total con combos y beneficios | `Pedido.getPrecioTotal`, `Combo.getPrecio` y `Beneficio` |
-| 9 | Aplicar solo el descuento más beneficioso | `SelectorDeDescuento.obtenerMejorDescuento` |
-| 10 | Consultar el historial con lo cobrado | `GestorPedidos.getHistorial` / `consultarFactura` y `Factura` |
-
----
+| 5 | Procesar en orden de llegada y marcar el avance | `Estacion.iniciarSiguiente` / `finalizar` |
+| 6 | Impedir modificar un ítem en preparación | `Pedido` e `ItemPedido` validan el estado |
+| 7 | No facturar hasta que todos los ítems estén listos | `Pedido.facturarPedido` |
+| 8 | Calcular el precio total con combos | `Pedido.getPrecioTotal` y `Combo.getPrecio` |
+| 9 | Aplicar solo el descuento más beneficioso | `SelectorDeDescuento` |
+| 10 | Consultar el historial con lo cobrado | `GestorPedidos.getHistorial` / `consultarFactura` |
 
 ## Patrones de diseño
 
-| Patrón | Categoría | Dónde |
+| Patrón | Categoría | Dónde lo usamos |
 |---|---|---|
-| [Factory Method](#1-factory-method) | Creacional | Creación de pedidos según su modalidad |
-| [Composite](#2-composite) | Estructural | Productos individuales y combos |
-| [Strategy](#3-strategy) | Comportamiento | Beneficio de cada combo y descuentos del pedido |
-| [Template Method](#4-template-method) | Comportamiento | Cálculo de los descuentos porcentuales |
-| [Chain of Responsibility](#5-chain-of-responsibility) | Comportamiento | Distribución de ítems entre las estaciones |
-| [Memento](#6-memento) | Comportamiento | Deshacer cambios en un pedido en construcción |
+| Factory Method | Creacional | Creación de pedidos según su modalidad |
+| Composite | Estructural | Productos individuales y combos |
+| Strategy | Comportamiento | Beneficio de los combos y descuentos del pedido |
+| Template Method | Comportamiento | Descuentos porcentuales |
+| Chain of Responsibility | Comportamiento | Reparto de ítems entre las estaciones |
 
-### 1. Factory Method
+### Factory Method (creacional)
 
-**Categoría:** creacional.
+**Problema.** El enunciado pide que sea fácil sumar modalidades nuevas. Cada modalidad necesita datos distintos:
 
-**Problema.** El enunciado pide que *"en un futuro sea sencillo sumar nuevas modalidades sin tener que rehacer todo el sistema"*. Cada modalidad necesita datos distintos:
+- salón: la mesa;
+- retiro: el horario y el teléfono;
+- envío: la dirección.
 
-- Salón: la mesa.
-- Retiro: el horario y el teléfono.
-- Envío: la dirección.
-
-Sin el patrón, `GestorPedidos` tendría un `if`/`switch` por modalidad, y habría que modificarlo cada vez que se agrega una.
+Sin el patrón, `GestorPedidos` necesitaría un `if` por modalidad.
 
 **Participantes.**
 
 | Rol | Clase |
 |---|---|
-| Creador (interfaz) | `FabricaPedido` |
+| Creador | interfaz `FabricaPedido` |
 | Creadores concretos | `FabricaPedidoSalon`, `FabricaPedidoRetiro`, `FabricaPedidoEnvio` |
-| Producto | `Pedido` (abstracta) |
+| Producto | `Pedido` |
 | Productos concretos | `PedidoSalon`, `PedidoRetiro`, `PedidoEnvio` |
-| Cliente | `GestorPedidos.registrarPedido(fabrica)` |
 
 **Diagrama.**
 
@@ -271,9 +143,6 @@ classDiagram
     class FabricaPedido {
         <<interface>>
         +crearPedido(numero) Pedido
-    }
-    class Pedido {
-        <<abstract>>
     }
     FabricaPedido <|.. FabricaPedidoSalon
     FabricaPedido <|.. FabricaPedidoRetiro
@@ -289,26 +158,20 @@ classDiagram
 
 **Justificación.**
 
-- **Ventajas:**
-  - El gestor asigna el número y guarda el pedido sin conocer su modalidad.
-  - Una modalidad nueva se suma con un `Pedido` y una `Fabrica` nuevos, sin tocar el gestor (principio abierto/cerrado).
-  - Cada fábrica recibe en su constructor los datos propios de su modalidad.
-- **Costos:** cada modalidad requiere dos clases, y se agrega un nivel de indirección.
+- **Ventaja:** el gestor numera y guarda los pedidos sin saber de qué modalidad son. Para agregar una modalidad alcanza con un pedido y una fábrica nuevos, sin tocar el gestor.
+- **Costo:** cada modalidad necesita dos clases.
 
-### 2. Composite
+### Composite (estructural)
 
-**Categoría:** estructural.
-
-**Problema.** Un pedido contiene productos individuales y combos, y ambos deben poder agregarse, quitarse y cotizarse de la misma forma. Al confirmar, los dos tienen que desarmarse en los ítems que prepara la cocina.
+**Problema.** Un pedido puede tener productos sueltos y combos, y los dos se tienen que poder agregar, quitar y cotizar de la misma forma.
 
 **Participantes.**
 
 | Rol | Clase |
 |---|---|
-| Componente | `Producto` (interfaz: `getNombre`, `getPrecio`, `getItems`) |
-| Hoja | `Item` (`getItems` devuelve `[this]`) |
-| Compuesto | `Combo` (`getItems` devuelve sus ítems y `getPrecio` aplica su beneficio) |
-| Cliente | `Pedido` (trabaja solo con `Producto`) |
+| Componente | interfaz `Producto` |
+| Hoja | `Item` |
+| Compuesto | `Combo` |
 
 **Diagrama.**
 
@@ -328,36 +191,23 @@ classDiagram
 
 **Justificación.**
 
-- **Ventajas:** `Pedido` calcula precios y genera los ítems de cocina sin preguntar si cada producto es un combo, así que no hay condicionales por tipo.
-- **Limitación:** un `Combo` agrupa `Item`s y no otros `Producto`s, por lo que no admite combos dentro de combos. Es una simplificación deliberada, porque el enunciado no lo pide.
+- **Ventaja:** `Pedido` calcula el precio y arma los ítems de cocina sin preguntar si cada producto es un combo.
+- **Limitación:** un combo agrupa ítems, no otros combos. El enunciado no lo pide.
 
-### 3. Strategy
+### Strategy (comportamiento)
 
-**Categoría:** comportamiento. Se aplica en dos lugares.
+**Problema.** Lo usamos en dos lugares:
 
-#### 3a. Beneficio del combo
-
-**Problema.** El enunciado dice que *"el beneficio del combo puede expresarse de distintas formas (…) un descuento porcentual (…) o un precio fijo cerrado"*. También pide poder crear combos nuevos sin modificar el sistema.
-
-**Participantes.**
-
-| Rol | Clase |
-|---|---|
-| Estrategia | `Beneficio` (interfaz: `calcularBeneficio(suma)`, que devuelve el precio final) |
-| Estrategias concretas | `BeneficioPorPorcentaje`, `BeneficioPorPrecioFijo` |
-| Contexto | `Combo` |
-
-#### 3b. Descuentos sobre el pedido
-
-**Problema.** Hay varios descuentos posibles (efectivo, día de la semana), cada uno con su propia condición. Hay que aplicar solo el más conveniente.
+- **Combos:** el beneficio de un combo puede ser un porcentaje o un precio fijo, y el dueño quiere crear combos nuevos sin modificar el sistema.
+- **Descuentos del pedido:** hay varios, cada uno con su propia condición, y se aplica solo el mejor.
 
 **Participantes.**
 
-| Rol | Clase |
-|---|---|
-| Estrategia | `Descuento` (interfaz: `calcularDescuento(pedido)`, que devuelve el monto a restar) |
-| Estrategias concretas | `DescuentoPorPagoEfectivo`, `DescuentoPorDiaDeSemana` |
-| Contexto | `SelectorDeDescuento` (evalúa todas las estrategias y se queda con el mayor monto) |
+| Rol | Combos | Descuentos |
+|---|---|---|
+| Estrategia | `Beneficio` | `Descuento` |
+| Estrategias concretas | `BeneficioPorPorcentaje`, `BeneficioPorPrecioFijo` | `DescuentoPorPagoEfectivo`, `DescuentoPorDiaDeSemana` |
+| Contexto | `Combo` | `SelectorDeDescuento` |
 
 **Diagrama.**
 
@@ -384,23 +234,23 @@ classDiagram
 **Justificación.**
 
 - **Ventajas:**
-  - Cada forma de calcular queda en su propia clase, sin condicionales.
-  - Un combo o un descuento nuevo es solo una clase nueva que implementa la interfaz.
-  - El selector elige el mejor descuento comparando montos, sin saber de qué tipo es cada uno.
-  - Las estrategias se prueban por separado.
-- **Costos:** hay más clases pequeñas. Además, `Beneficio` devuelve el *precio final* y `Descuento` el *monto a restar*: son dos contratos distintos que hay que tener presentes.
+  - Cada forma de calcular está en su propia clase.
+  - Para un combo o un descuento nuevo alcanza con una clase más.
+  - El selector compara los montos sin saber qué descuento es cada uno.
+- **Costo:** hay más clases chicas. Además, ojo: `Beneficio` devuelve el precio final y `Descuento` devuelve el monto a restar.
 
-### 4. Template Method
+### Template Method (comportamiento)
 
-**Categoría:** comportamiento.
+**Problema.** Los dos descuentos se calculan igual, como un porcentaje del total. Lo único que cambia es la condición:
 
-**Problema.** Los dos descuentos calculan el monto del mismo modo (un porcentaje del total) y solo cambian en **cuándo** aplican: si se paga en efectivo, o si es el día indicado.
+- `DescuentoPorPagoEfectivo`: que se pague en efectivo;
+- `DescuentoPorDiaDeSemana`: que sea el día indicado.
 
 **Participantes.**
 
 | Rol | Clase |
 |---|---|
-| Clase abstracta | `DescuentoPorcentual`: `calcularDescuento` es el método plantilla y `aplica` es el paso abstracto |
+| Clase abstracta | `DescuentoPorcentual`: `calcularDescuento` es el método plantilla |
 | Clases concretas | `DescuentoPorPagoEfectivo` y `DescuentoPorDiaDeSemana`, que implementan `aplica` |
 
 **Diagrama.**
@@ -409,7 +259,6 @@ classDiagram
 classDiagram
     class DescuentoPorcentual {
         <<abstract>>
-        -porcentaje: number
         +calcularDescuento(pedido) number
         #aplica(pedido)* boolean
     }
@@ -419,20 +268,18 @@ classDiagram
 
 **Justificación.**
 
-- **Ventaja:** el cálculo del porcentaje está en un único lugar, y cada subclase solo expresa su condición.
-- **Limitación:** sirve para descuentos *porcentuales*. Un descuento de monto fijo implementaría `Descuento` directamente.
+- **Ventaja:** la cuenta del porcentaje se escribe una sola vez.
+- **Limitación:** solo sirve para descuentos porcentuales.
 
-### 5. Chain of Responsibility
+### Chain of Responsibility (comportamiento)
 
-**Categoría:** comportamiento.
-
-**Problema.** El enunciado pide que *"si en el futuro agrega una estación nueva, esto no implique reescribir la lógica ya existente de las demás estaciones"*. Cada ítem tiene que llegar a la estación que lo prepara.
+**Problema.** El enunciado pide que agregar una estación nueva no obligue a reescribir las demás.
 
 **Participantes.**
 
 | Rol | Clase |
 |---|---|
-| Manejador | `Estacion` (abstracta: `recibir`, `acepta`, `setSiguiente`) |
+| Manejador | `Estacion` |
 | Manejadores concretos | `Parrilla`, `Barra`, `CocinaFria`, `CocinaDulce` |
 | Armado de la cadena | `CadenaEstaciones` |
 | Emisor | `GestorPedidos`, que solo conoce la primera estación |
@@ -443,8 +290,6 @@ classDiagram
 classDiagram
     class Estacion {
         <<abstract>>
-        -siguiente: Estacion
-        -items: ItemPedido[]
         +recibir(item) void
         +iniciarSiguiente() ItemPedido
         +finalizar(item) void
@@ -461,75 +306,15 @@ classDiagram
 
 **Justificación.**
 
-- **Ventajas:**
-  - El gestor no sabe cuántas estaciones existen ni qué prepara cada una.
-  - Una estación nueva se suma con una subclase y una línea en `CadenaEstaciones`, sin modificar las demás.
-  - Cada estación mantiene su propia cola FIFO.
-- **Costos:**
-  - Un ítem recorre la cadena hasta encontrar su estación.
-  - Si ninguna lo acepta, se lanza `ErrorEstacionNoEncontrada`.
-
-### 6. Memento
-
-**Categoría:** comportamiento.
-
-**Problema.** El enunciado plantea que *"el mozo necesita poder 'borrar' lo escrito hasta alcanzar el ítem a corregir"* sin descartar el pedido. Hay que poder volver atrás varios pasos, y solo mientras el pedido está en construcción.
-
-**Participantes.**
-
-| Rol | Clase |
-|---|---|
-| Originador | `Pedido` (guarda y restaura su lista de productos) |
-| Memento | Una copia de la lista de productos (`Producto[]`) |
-| Cuidador | La pila `Pedido.historial` |
-
-**Diagrama.**
-
-```mermaid
-classDiagram
-    class Pedido {
-        -productos: Producto[]
-        -historial: Producto[][]
-        -guardarEstado() void
-        +agregarProducto(producto) void
-        +eliminarProducto(producto) void
-        +deshacerUltimaAccion() void
-    }
-```
-
-**Justificación.**
-
-- **Ventajas:**
-  - Antes de cada cambio se guarda una copia del estado, y deshacer la recupera de la pila (LIFO).
-  - Se puede retroceder varios pasos.
-  - No hace falta saber qué operación se hizo, porque siempre se restaura el estado anterior completo.
-- **Limitaciones:**
-  - Es una versión simplificada del patrón: el cuidador vive dentro del propio `Pedido` y el memento es una copia del arreglo, no una clase propia.
-  - Guarda una copia por cada cambio, aunque para el tamaño de un pedido es despreciable.
-
----
-
-## Manejo de errores
-
-Los errores del dominio forman una jerarquía propia:
-
-```text
-Error
-└── ErrorRestaurante (abstracta)
-    ├── pedido/   ErrorPedidoNoExiste, ErrorPedidoEstadoIncorrecto, ErrorPedidoYaFacturado,
-    │             ErrorPedidoSinProductos, ErrorPedidoItemsNoListos, ErrorPedidoNoExisteMedioDePago,
-    │             ErrorItemPedidoEstadoIncorrecto, ErrorPedidoSinAccionesParaDeshacer
-    ├── estacion/ ErrorEstacionNoEncontrada, ErrorEstacionSinItems, ErrorEstacionItemNoEnPreparacion
-    └── menu/     ErrorComboMinimoItems
-```
-
-Cada excepción arma su mensaje con los datos del caso, como el número de pedido, el ítem o la estación. Quien usa el sistema puede atrapar todos los errores propios con un único `catch (error) { if (error instanceof ErrorRestaurante) … }` y relanzar cualquier otro error.
+- **Ventaja:** para sumar una estación alcanza con una subclase y una línea en `CadenaEstaciones`.
+- **Costo:** cada ítem recorre la cadena hasta encontrar su estación. Si ninguna lo acepta, se lanza `ErrorEstacionNoEncontrada`.
 
 ## Diagramas
 
-Los diagramas están en la carpeta `diagramas/`, en formato PlantUML:
+En la carpeta `diagramas/`, en formato PlantUML:
 
-- [`clasesTP.puml`](diagramas/clasesTP.puml): diagrama de clases de la solución.
-- Diagramas de secuencia: _pendiente_.
+- [Diagrama de clases](diagramas/clasesTP.puml)
+- [Secuencia: deshacer la última modificación](diagramas/Secuencia/secuencia_deshacer.puml) (requerimiento 3)
+- [Secuencia: facturar con el mejor descuento](diagramas/Secuencia/secuencia_facturar.puml) (requerimientos 7 y 9)
 
-Para verlos en VS Code, instalar la extensión **PlantUML** y abrir el archivo con `Alt + D`.
+Para verlos en VS Code, instalá la extensión PlantUML y apretá `Alt + D` con el archivo abierto.

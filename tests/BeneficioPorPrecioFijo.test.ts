@@ -1,8 +1,9 @@
 import { BeneficioPorPrecioFijo } from "../src/beneficio/BeneficioPorPrecioFijo";
+import { Beneficio } from "../src/beneficio/Beneficio";
 
 describe("Tests de la clase BeneficioPorPrecioFijo", () => {
 
-  let comboParrillada: BeneficioPorPrecioFijo;
+  let comboParrillada: Beneficio;
 
   beforeEach(() => {
     comboParrillada = new BeneficioPorPrecioFijo(80000);

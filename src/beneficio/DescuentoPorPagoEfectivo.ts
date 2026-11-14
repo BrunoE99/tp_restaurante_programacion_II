@@ -22,11 +22,11 @@ export class DescuentoPorPagoEfectivo extends DescuentoPorcentual {
      * 
      * @param pedido Pedido a evaluar.
      * @returns `true` si tiene un medio de pago asignado y califica para el descuento; 
-     * `false` si no tiene medio de pago o no califica.
+     * `false` `false` si no tiene medio de pago, no califica o el porcentaje es 0.
      */
     protected aplica(pedido: Pedido): boolean {
         const medio = pedido.getMedioDePago();
-        if (medio === undefined) {
+        if (medio === undefined || this.getPorcentaje() <= 0) {
             return false;
         }
         return medio.aplicaDescuentoEfectivo();

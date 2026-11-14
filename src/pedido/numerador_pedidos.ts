@@ -1,7 +1,8 @@
 /**
  * Genera los numeros de pedido, de forma consecutiva y sin repetir (1, 2, 3, ...).
  * 
- * Es usado por {@link pedido/gestor_pedidos!GestorPedidos} al registrar cada pedido, para que todos tengan un numero unico.
+ * Es usado por {@link pedido/gestor_pedidos!GestorPedidos} al registrar cada pedido, 
+ * para que todos tengan un numero unico.
  */
 export class NumeradorPedidos {
 

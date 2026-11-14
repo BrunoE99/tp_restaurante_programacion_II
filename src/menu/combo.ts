@@ -27,7 +27,7 @@ export class Combo implements Producto {
      * @param nombre Nombre del combo en el menu.
      * @param items Items que forman el combo (minimo 2)
      * @param beneficio Beneficio utilizado para calcular el precio especial del combo.
-     * @throws Lanza {@link ErrorComboMinimoItems} Si la cantidad de items recibida es menor al `minimoItems`.
+
      */
     public constructor(nombre: string, items: Item[], beneficio: Beneficio) {
         if (items.length < this.minimoItems) {

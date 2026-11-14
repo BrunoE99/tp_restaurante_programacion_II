@@ -1,9 +1,10 @@
 /**
  * Ejemplo de uso del sistema de gestion de pedidos de "Fogon del Barrio".
  * 
- * Configura el menu {@link Menu}, la cadena de estaciones {@link estacion/cadenaEstaciones!CadenaEstaciones}, las estrategias
- * de descuento {@link SelectorDeDescuento} y el gestor de pedidos {@link pedido/gestor_pedidos!GestorPedidos}; ejecutando
- * de un extermo a otro el flujo de pedidos en salon, retiro y envio a domicilio.
+ * Configura el menu {@link Menu}, la cadena de estaciones {@link estacion/cadenaEstaciones!CadenaEstaciones},
+ * las estrategias de descuento {@link SelectorDeDescuento} y el gestor de pedidos 
+ * {@link pedido/gestor_pedidos!GestorPedidos}; ejecutando de un extermo a otro 
+ * el flujo de pedidos en salon, retiro y envio a domicilio.
  * 
  * Toda la logica va dentro de un unico `try` con los errores {@link ErrorRestaurante} manejandose
  * en un unico `catch`.

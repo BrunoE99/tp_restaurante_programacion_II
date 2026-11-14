@@ -19,6 +19,13 @@ export abstract class DescuentoPorcentual implements Descuento {
     }
 
     /**
+     * @returns El porcentaje de descuento, en escala de 0 a 100.
+     */
+    protected getPorcentaje(): number {
+        return this.porcentaje;
+    }
+
+    /**
      * Calcula el importe a descontar si el pedido cumple la condicion definida por la subclase.
      * 
      * @param pedido Pedido sobre el cual se evalua el descuento.
