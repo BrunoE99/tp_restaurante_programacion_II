@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza al cambiar el medio de pago de un pedido que ya esta facturado.
  * 
- * @see {@link Pedido.validarPedidoNoFacturado}
+ * @see {@link pedido/pedido!Pedido.setMedioDePago}
  */
 export class ErrorPedidoYaFacturado extends ErrorRestaurante {
 

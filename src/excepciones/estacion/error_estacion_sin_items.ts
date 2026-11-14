@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza al pedir el siguiente item de una estacion que no tiene mas items.
  * 
- * @see {@link Estacion.iniciarSiguiente}
+ * @see {@link estacion/estacion!default.iniciarSiguiente}
  */
 export class ErrorEstacionSinItems extends ErrorRestaurante {
     

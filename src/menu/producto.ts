@@ -11,7 +11,7 @@ export default interface Producto {
      * Calcula y devuelve el precio final del producto.
      * 
      * @returns Precio de venta del producto: precio unitario en caso de {@link Item}
-     * o importe con beneficio en caso de {@link Combo}.
+     * o importe con beneficio en caso de {@link menu/combo!Combo}.
      */
     getPrecio(): number;
 

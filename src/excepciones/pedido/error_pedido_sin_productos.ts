@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza al confirmar un pedido que no tiene ningun producto.
  * 
- * @see {@link Pedido.confirmarPedido}
+ * @see {@link pedido/pedido!Pedido.confirmarPedido}
  */
 export class ErrorPedidoSinProductos extends ErrorRestaurante {
 

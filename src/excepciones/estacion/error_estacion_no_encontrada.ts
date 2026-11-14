@@ -4,7 +4,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza cuando un item de una categoria no puede ser aceptado por ninguna estacion.
  * 
- * @see {@link Estacion.recibir}
+ * @see {@link estacion/estacion!default.recibir}
  */
 export class ErrorEstacionNoEncontrada extends ErrorRestaurante {
 

@@ -1,176 +1,535 @@
-# Configuración del entorno de desarrollo para Programación 2
+# 🍽️ Fogón del Barrio — Gestión de Pedidos
 
-Vamos a comentar cómo instalar todos los componentes necesarios sobre la máquina host.
+Trabajo práctico de **Programación II** (Grupo 5).
 
-## Instalar NodeJs
+Sistema en TypeScript que digitaliza la gestión de pedidos del restaurante "Fogón del Barrio". Cubre todo el recorrido de un pedido:
 
-1. Ingresar a [NodeJs - Descargas](https://nodejs.org/en/download/) y seleccionar según la plataforma en la que nos encontremos el instalador que mejor se adapte a nuestro sistema operativo.
+1. El cliente lo realiza.
+2. La cocina lo prepara, repartido entre sus estaciones.
+3. Se genera la cuenta con el mejor descuento disponible.
+4. Queda guardado en el historial.
 
-👉 En el caso de Windows, seleccionar los instaladores que se encuentran en la pestaña "Prebuilt Installer"
+## Integrantes
 
+| Nombre | Usuario de GitHub |
+|---|---|
+| Bruno Enrigo | juanfdamelio |
+| Juan Francisco Damelio | BrunoE99 |
 
+---
 
-👉 En el caso de MacOs o Linux, seleccionar la pestaña "Package Manager" y seleccionar "NVM" en el último combo. Luego copiar y ejecutar en una terminal los comandos que se muestran.
+## Tabla de contenidos
 
+- [Requisitos](#requisitos)
+- [Instalación](#instalación)
+- [Compilación y ejecución](#compilación-y-ejecución)
+- [Pruebas y cobertura](#pruebas-y-cobertura)
+- [Estilo de código (ESLint)](#estilo-de-código-eslint)
+- [Documentación del código (JSDoc)](#documentación-del-código-jsdoc)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Funcionamiento](#funcionamiento)
+- [Requerimientos funcionales](#requerimientos-funcionales)
+- [Patrones de diseño](#patrones-de-diseño)
+- [Manejo de errores](#manejo-de-errores)
+- [Diagramas](#diagramas)
 
+---
 
-⚠️ **En todos los casos seleccionar alguna versión estable (LTS)**
+## Requisitos
 
-## Directorio de trabajo
+- [Node.js](https://nodejs.org/) en una versión LTS (incluye `npm`).
+- Opcional: Visual Studio Code con las extensiones ESLint, Jest y PlantUML.
 
-Una vez instalado node, debemos crear el directorio en el cual vamos a desarrollar.
-Crear un directorio, que será el directorio del proyecto a utilizar y dentro del mismo descomprimir el archivo 📦 *bootstrap.zip*.
+## Instalación
 
-Este archivo contiene lo siguiente:
-
-📂/
-
-- 📂 src: directorio donde crearemos todos los archivos typescript (\*.ts)
-  - 📄 index.ts: archivo de prueba. A futuro será nuestro punto de entrada.
-- 📂 tests: directorio donde crearemos las pruebas unitarias 
-- 📄 package.json: este archivo contiene los comandos a utilizar en el desarrollo y los paquetes necesarios para construir nuestra solución.
-- 📄 tsconfig.json: este archivo contiene la configuración utilizada en el proceso de "compilación"
-- 📄 jest.config.js: este archivo contiene la configuración utilizada durante la ejecución de las pruebas unitarias.
-- 📄 README.md: este archivo.
-
-## Instalar las dependencias
-
-Desde una terminal, ingresar al directorio de trabajo creado y ejecutar el siguiente comando: 
-
-```bash
-# comando que permite instalar los paquetes especificados en el archivo package.json
-user@host:~$ npm i
-```
-
-## Compilar el proyecto
-
-Desde una terminal, ingresar al directorio de trabajo creado y ejecutar el siguiente comando: 
+Desde la carpeta del proyecto:
 
 ```bash
-# comando que permite compilar la solución.
-user@host:~$ npm run build
+npm install
 ```
 
-## Configurar VisualCode (IDE)
+## Compilación y ejecución
 
-Instalar los siguientes complementos:
+| Comando | Qué hace |
+|---|---|
+| `npm run dev-mode` | Ejecuta `src/index.ts` directamente con `ts-node`, sin compilar. Es la forma más rápida de ver la demo. |
+| `npm run build` | Limpia `dist/`, corre ESLint y compila con `tsc`. **Falla si hay errores de lint.** |
+| `npm start` | Ejecuta la versión compilada (`dist/index.js`). Requiere `npm run build` antes. |
+| `npm run start:dev` | `build` + `start` en un solo paso. |
 
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
-* [JEST](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest)
-* [PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)
-* [Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)
-* [Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)
+### Qué muestra la demo
 
-# Reglas de estilo de código (ESLint)
+`src/index.ts` arma el menú y registra 3 pedidos, uno por modalidad:
 
-El proyecto incluye una configuración de ESLint (`eslint.config.js`) que estandariza el código. Para verificarla ejecutar:
+| Pedido | Modalidad | Productos | Medio de pago |
+|---|---|---|---|
+| 1 | Salón | Combo Hamburguesa y Flan | Efectivo |
+| 2 | Retiro | Combo Parrillero | Billetera virtual |
+| 3 | Envío | Ensalada César y Gaseosa | Efectivo |
+
+Después de registrarlos, la demo:
+
+1. Confirma los pedidos.
+2. Hace que cada estación prepare sus ítems en orden de llegada.
+3. Factura los pedidos.
+4. Imprime el historial con el detalle de cada factura.
+
+Esta es la salida esperada un día en que no rige el descuento por día de la semana:
+
+```text
+[Parrilla] Pedido 1: Hamburguesa
+[Parrilla] Pedido 2: Bife de chorizo
+[Barra] Pedido 1: Gaseosa
+[Barra] Pedido 2: Gaseosa
+[Barra] Pedido 3: Gaseosa
+[Cocina fria] Pedido 1: Ensalada cesar
+[Cocina fria] Pedido 3: Ensalada cesar
+[Cocina dulce] Pedido 1: Flan
+[Cocina dulce] Pedido 2: Flan
+Historial de pedidos:
+Factura del pedido 1:
+--------------------------------------------------
+Combo Hamburguesa: $7650.00
+Flan: $1800.00
+--------------------------------------------------
+Subtotal: $9450.00
+Descuento: $945.00
+Total: $8505.00
+...
+```
+
+Si algo falla, el `index` atrapa los errores propios del sistema (`ErrorRestaurante`) y muestra su mensaje.
+
+## Pruebas y cobertura
+
+Las pruebas unitarias usan [Jest](https://jestjs.io/) con `ts-jest` y están en la carpeta `tests/`.
 
 ```bash
-# revisa el código en src/ y reporta errores
-user@host:~$ npm run lint
+# compila (lint + tsc) y ejecuta todas las pruebas
+npm test
 
-# revisa el código y corrige automáticamente lo que se pueda
-user@host:~$ npm run lint-fix
+# ejecuta solo las pruebas, sin compilar
+npx jest
+
+# ejecuta las pruebas y genera el reporte de cobertura (carpeta coverage/)
+npx jest --coverage
 ```
 
-A continuación se muestran ejemplos de cada regla configurada.
+El objetivo es una cobertura **superior al 80 %**. El reporte HTML queda en `coverage/lcov-report/index.html`.
 
-## Nombres de clases, interfaces y tipos (PascalCase)
+## Estilo de código (ESLint)
 
-| ❌ Incorrecto        | ✅ Correcto          |
-| ------------------- | ------------------- |
-| `class persona { }` | `class Persona { }` |
+El proyecto usa la configuración de ESLint provista por la cátedra (`eslint.config.js`). Algunas de sus reglas:
 
-## Nombres de constantes globales (UPPER_CASE)
+- `PascalCase` en clases.
+- `camelCase` en métodos y variables.
+- `UPPER_CASE` en constantes globales.
+- Nombres de al menos 4 caracteres.
+- Sin números mágicos.
+- Métodos de 40 líneas como máximo.
 
-| ❌ Incorrecto             | ✅ Correcto                |
-| ------------------------ | ------------------------- |
-| `const maxIntentos = 3;` | `const MAX_INTENTOS = 3;` |
+```bash
+npm run lint       # reporta errores
+npm run lint-fix   # corrige automáticamente lo que se pueda
+```
 
-## Nombres de variables y funciones (camelCase)
+## Documentación del código (JSDoc)
 
-| ❌ Incorrecto                  | ✅ Correcto                   |
-| ----------------------------- | ---------------------------- |
-| `let Nombre_Usuario = "Ana";` | `let nombreUsuario = "Ana";` |
+Todas las clases y métodos públicos están documentados con comentarios JSDoc. Cada comentario indica:
 
-## Nombres de métodos de clase (camelCase)
+- **Parámetros** (`@param`).
+- **Valor de retorno** (`@returns`).
+- **Excepciones** que puede lanzar (`@throws`), incluidas las que se propagan desde otras clases.
+- **Ejemplos de uso** (`@example`).
 
-| ❌ Incorrecto                 | ✅ Correcto                   |
-| ---------------------------- | ---------------------------- |
-| `public Saludar(): void { }` | `public saludar(): void { }` |
+Para generar el sitio HTML de la documentación:
 
-## Longitud mínima de los nombres (mínimo 4 caracteres)
+```bash
+npx typedoc
+```
 
-Se exceptúan los contadores de bucles `i`, `j` y `k`.
+El resultado queda en `docs/`.
 
-| ❌ Incorrecto    | ✅ Correcto          |
-| --------------- | ------------------- |
-| `const n = 10;` | `const total = 10;` |
+## Estructura del proyecto
 
-## Números mágicos
+```text
+├── diagramas/              Diagramas UML (PlantUML)
+├── src/
+│   ├── index.ts            Demo: punto de entrada
+│   ├── beneficio/          Beneficios de combos y descuentos sobre el pedido
+│   ├── calculo_dia/        Obtiene el día de la semana de una fecha
+│   ├── empleados-cliente/  Cliente
+│   ├── enums/              Categoria, DiaSemana, EstadoItem, EstadoPedido
+│   ├── estacion/           Estaciones de cocina y la cadena que las une
+│   ├── excepciones/        Jerarquía de errores propios (pedido/, estacion/, menu/)
+│   ├── medios_de_pago/     Efectivo, tarjetas (débito/crédito), billetera virtual
+│   ├── menu/               Menú, productos individuales (Item) y combos
+│   └── pedido/             Pedido y sus modalidades, gestor, factura, numerador
+│       └── fabrica/        Fábricas de cada modalidad de pedido
+├── tests/                  Pruebas unitarias (Jest)
+├── eslint.config.js        Reglas de estilo (provistas por la cátedra)
+├── jest.config.js
+├── tsconfig.json
+└── package.json
+```
 
-Los números "sueltos" dentro de una expresión deben reemplazarse por una constante con nombre (los índices de arreglo, como `arr[0]`, están permitidos).
+## Funcionamiento
 
-| ❌ Incorrecto                       | ✅ Correcto                                                                 |
-| ---------------------------------- | -------------------------------------------------------------------------- |
-| `for (let i = 0; i < 10; i++) { }` | `const MAX_INTENTOS = 10;`<br>`for (let i = 0; i < MAX_INTENTOS; i++) { }` |
+`GestorPedidos` es el punto de entrada del sistema: registra los pedidos y los identifica por número, los confirma y los factura.
 
-## Longitud máxima de un método (40 líneas)
+### Ciclo de vida de un pedido
 
-| ❌ Incorrecto                                                                                                     | ✅ Correcto                                                                                                         |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `public calcular(): number {`<br>`  // ... 45 líneas de código`<br>`  // todo mezclado en un solo método`<br>`}` | `public calcular(): number {`<br>`  const datos = this.obtenerDatos();`<br>`  return this.procesar(datos);`<br>`}` |
+```text
+                 agregar / quitar / deshacer
+                        ┌──────┐
+                        ▼      │
+  registrarPedido ─► EN_CONSTRUCCION ──confirmarPedido──► CONFIRMADO ──facturarPedido──► FACTURADO
+                                                              │                       (historial
+                                              los ítems van a las estaciones           + factura)
+```
 
-## Longitud máxima de línea (120 caracteres)
+### Ciclo de vida de un ítem en la cocina
 
-| ❌ Incorrecto                                                                                                                 | ✅ Correcto                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `const mensaje = "un texto larguísimo que supera ampliamente los 120 caracteres permitidos en una sola línea de código...";` | `const mensaje =`<br>`  "un texto largo " +`<br>`  "separado en varias líneas.";` |
+```text
+  PENDIENTE ──iniciarSiguiente──► EN_PREPARACION ──finalizar──► LISTO
+```
 
-## Llaves obligatorias en `if`/`else`/`for`/`while`
+Al confirmarse, el pedido desarma cada producto (los combos también) en sus ítems. Cada ítem recorre la cadena de estaciones hasta encontrar la que prepara su categoría:
 
-| ❌ Incorrecto                       | ✅ Correcto                                         |
-| ---------------------------------- | -------------------------------------------------- |
-| `if (activo) console.log("Hola");` | `if (activo) {`<br>`  console.log("Hola");`<br>`}` |
+| Estación | Categoría |
+|---|---|
+| Parrilla | `CARNE` |
+| Barra | `BEBIDA` |
+| Cocina fría | `ENSALADA` |
+| Cocina dulce | `POSTRE` |
 
-## Espaciado en estructuras de control
+Cada estación atiende sus ítems **en el orden en que llegaron** (cola FIFO).
 
-Espacio después de la palabra clave (`if`, `for`, `while`) y antes del `(`; sin espacios pegados a `(` o `)`; espacio antes de `{`.
+### Precio y descuentos
 
-| ❌ Incorrecto                                     | ✅ Correcto                                         |
-| ------------------------------------------------ | -------------------------------------------------- |
-| `if(activo){`<br>`  console.log("Hola");`<br>`}` | `if (activo) {`<br>`  console.log("Hola");`<br>`}` |
+- **Precio del pedido**: es la suma de sus productos. El precio de un combo es la suma de sus ítems con su beneficio aplicado, que puede ser un porcentaje o un precio fijo.
+- **Total a cobrar**: es el precio menos **un solo** descuento, el más conveniente para el cliente. Los descuentos disponibles son:
+  - **Pago en efectivo**: 10 % por defecto.
+  - **Día de la semana**: lunes y 15 % por defecto. Tanto el día como el porcentaje se pueden configurar.
 
-## Modificadores de acceso explícitos
+---
 
-Todo campo o método de una clase debe declarar `public`, `private` o `protected`.
+## Requerimientos funcionales
 
-| ❌ Incorrecto                                    | ✅ Correcto                                              |
-| ----------------------------------------------- | ------------------------------------------------------- |
-| `class Persona {`<br>`  nombre: string;`<br>`}` | `class Persona {`<br>`  private nombre: string;`<br>`}` |
+| # | Requerimiento | Dónde se implementa |
+|---|---|---|
+| 1 | Registrar un pedido en una de las tres modalidades | `GestorPedidos.registrarPedido` y las fábricas de `pedido/fabrica/` |
+| 2 | Agregar y quitar productos mientras está en construcción | `Pedido.agregarProducto` / `eliminarProducto` |
+| 3 | Deshacer la última modificación | `Pedido.deshacerUltimaAccion` |
+| 4 | Confirmar y distribuir los ítems entre las estaciones | `GestorPedidos.confirmarPedido` y `Estacion.recibir` |
+| 5 | Cada estación procesa en orden de llegada y marca el avance | `Estacion.iniciarSiguiente` / `finalizar` e `ItemPedido` |
+| 6 | Impedir modificar un ítem en preparación | `Pedido` deja de admitir cambios al confirmarse, e `ItemPedido` valida cada cambio de estado |
+| 7 | No facturar hasta que todos los ítems estén listos | `Pedido.facturarPedido` y `todosItemsListos` |
+| 8 | Calcular el precio total con combos y beneficios | `Pedido.getPrecioTotal`, `Combo.getPrecio` y `Beneficio` |
+| 9 | Aplicar solo el descuento más beneficioso | `SelectorDeDescuento.obtenerMejorDescuento` |
+| 10 | Consultar el historial con lo cobrado | `GestorPedidos.getHistorial` / `consultarFactura` y `Factura` |
 
-## Métodos que no usan `this`
+---
 
-Si un método no usa `this`, probablemente debería ser `static`.
+## Patrones de diseño
 
-| ❌ Incorrecto                                                                                                                             | ✅ Correcto                                                                                                                                      |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `class Calculadora {`<br>`  public sumar(primero: number, segundo: number): number {`<br>`    return primero + segundo;`<br>`  }`<br>`}` | `class Calculadora {`<br>`  public static sumar(primero: number, segundo: number): number {`<br>`    return primero + segundo;`<br>`  }`<br>`}` |
+| Patrón | Categoría | Dónde |
+|---|---|---|
+| [Factory Method](#1-factory-method) | Creacional | Creación de pedidos según su modalidad |
+| [Composite](#2-composite) | Estructural | Productos individuales y combos |
+| [Strategy](#3-strategy) | Comportamiento | Beneficio de cada combo y descuentos del pedido |
+| [Template Method](#4-template-method) | Comportamiento | Cálculo de los descuentos porcentuales |
+| [Chain of Responsibility](#5-chain-of-responsibility) | Comportamiento | Distribución de ítems entre las estaciones |
+| [Memento](#6-memento) | Comportamiento | Deshacer cambios en un pedido en construcción |
 
-## Una sola clase por archivo
+### 1. Factory Method
 
-| ❌ Incorrecto                                              | ✅ Correcto                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `// animal.ts`<br>`class Animal { }`<br>`class Perro { }` | `// animal.ts`<br>`class Animal { }`<br><br>`// perro.ts`<br>`class Perro { }` |
+**Categoría:** creacional.
 
-## Sin métodos o funciones vacías
+**Problema.** El enunciado pide que *"en un futuro sea sencillo sumar nuevas modalidades sin tener que rehacer todo el sistema"*. Cada modalidad necesita datos distintos:
 
-| ❌ Incorrecto                    | ✅ Correcto                                                       |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `public constructor() {`<br>`}` | `public constructor() {`<br>`  this.inicializado = true;`<br>`}` |
+- Salón: la mesa.
+- Retiro: el horario y el teléfono.
+- Envío: la dirección.
 
-## Tipo de retorno explícito
+Sin el patrón, `GestorPedidos` tendría un `if`/`switch` por modalidad, y habría que modificarlo cada vez que se agrega una.
 
-| ❌ Incorrecto                                                 | ✅ Correcto                                                           |
-| ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| `public obtenerNombre() {`<br>`  return this.nombre;`<br>`}` | `public obtenerNombre(): string {`<br>`  return this.nombre;`<br>`}` |
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Creador (interfaz) | `FabricaPedido` |
+| Creadores concretos | `FabricaPedidoSalon`, `FabricaPedidoRetiro`, `FabricaPedidoEnvio` |
+| Producto | `Pedido` (abstracta) |
+| Productos concretos | `PedidoSalon`, `PedidoRetiro`, `PedidoEnvio` |
+| Cliente | `GestorPedidos.registrarPedido(fabrica)` |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class FabricaPedido {
+        <<interface>>
+        +crearPedido(numero) Pedido
+    }
+    class Pedido {
+        <<abstract>>
+    }
+    FabricaPedido <|.. FabricaPedidoSalon
+    FabricaPedido <|.. FabricaPedidoRetiro
+    FabricaPedido <|.. FabricaPedidoEnvio
+    Pedido <|-- PedidoSalon
+    Pedido <|-- PedidoRetiro
+    Pedido <|-- PedidoEnvio
+    FabricaPedidoSalon ..> PedidoSalon : crea
+    FabricaPedidoRetiro ..> PedidoRetiro : crea
+    FabricaPedidoEnvio ..> PedidoEnvio : crea
+    GestorPedidos ..> FabricaPedido : usa
+```
+
+**Justificación.**
+
+- **Ventajas:**
+  - El gestor asigna el número y guarda el pedido sin conocer su modalidad.
+  - Una modalidad nueva se suma con un `Pedido` y una `Fabrica` nuevos, sin tocar el gestor (principio abierto/cerrado).
+  - Cada fábrica recibe en su constructor los datos propios de su modalidad.
+- **Costos:** cada modalidad requiere dos clases, y se agrega un nivel de indirección.
+
+### 2. Composite
+
+**Categoría:** estructural.
+
+**Problema.** Un pedido contiene productos individuales y combos, y ambos deben poder agregarse, quitarse y cotizarse de la misma forma. Al confirmar, los dos tienen que desarmarse en los ítems que prepara la cocina.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Componente | `Producto` (interfaz: `getNombre`, `getPrecio`, `getItems`) |
+| Hoja | `Item` (`getItems` devuelve `[this]`) |
+| Compuesto | `Combo` (`getItems` devuelve sus ítems y `getPrecio` aplica su beneficio) |
+| Cliente | `Pedido` (trabaja solo con `Producto`) |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Producto {
+        <<interface>>
+        +getNombre() string
+        +getPrecio() number
+        +getItems() Item[]
+    }
+    Producto <|.. Item
+    Producto <|.. Combo
+    Combo o-- "2..*" Item
+    Pedido o-- "*" Producto
+```
+
+**Justificación.**
+
+- **Ventajas:** `Pedido` calcula precios y genera los ítems de cocina sin preguntar si cada producto es un combo, así que no hay condicionales por tipo.
+- **Limitación:** un `Combo` agrupa `Item`s y no otros `Producto`s, por lo que no admite combos dentro de combos. Es una simplificación deliberada, porque el enunciado no lo pide.
+
+### 3. Strategy
+
+**Categoría:** comportamiento. Se aplica en dos lugares.
+
+#### 3a. Beneficio del combo
+
+**Problema.** El enunciado dice que *"el beneficio del combo puede expresarse de distintas formas (…) un descuento porcentual (…) o un precio fijo cerrado"*. También pide poder crear combos nuevos sin modificar el sistema.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Estrategia | `Beneficio` (interfaz: `calcularBeneficio(suma)`, que devuelve el precio final) |
+| Estrategias concretas | `BeneficioPorPorcentaje`, `BeneficioPorPrecioFijo` |
+| Contexto | `Combo` |
+
+#### 3b. Descuentos sobre el pedido
+
+**Problema.** Hay varios descuentos posibles (efectivo, día de la semana), cada uno con su propia condición. Hay que aplicar solo el más conveniente.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Estrategia | `Descuento` (interfaz: `calcularDescuento(pedido)`, que devuelve el monto a restar) |
+| Estrategias concretas | `DescuentoPorPagoEfectivo`, `DescuentoPorDiaDeSemana` |
+| Contexto | `SelectorDeDescuento` (evalúa todas las estrategias y se queda con el mayor monto) |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Beneficio {
+        <<interface>>
+        +calcularBeneficio(suma) number
+    }
+    Beneficio <|.. BeneficioPorPorcentaje
+    Beneficio <|.. BeneficioPorPrecioFijo
+    Combo o-- Beneficio
+
+    class Descuento {
+        <<interface>>
+        +calcularDescuento(pedido) number
+    }
+    Descuento <|.. DescuentoPorcentual
+    DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
+    DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+    SelectorDeDescuento o-- "*" Descuento
+```
+
+**Justificación.**
+
+- **Ventajas:**
+  - Cada forma de calcular queda en su propia clase, sin condicionales.
+  - Un combo o un descuento nuevo es solo una clase nueva que implementa la interfaz.
+  - El selector elige el mejor descuento comparando montos, sin saber de qué tipo es cada uno.
+  - Las estrategias se prueban por separado.
+- **Costos:** hay más clases pequeñas. Además, `Beneficio` devuelve el *precio final* y `Descuento` el *monto a restar*: son dos contratos distintos que hay que tener presentes.
+
+### 4. Template Method
+
+**Categoría:** comportamiento.
+
+**Problema.** Los dos descuentos calculan el monto del mismo modo (un porcentaje del total) y solo cambian en **cuándo** aplican: si se paga en efectivo, o si es el día indicado.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Clase abstracta | `DescuentoPorcentual`: `calcularDescuento` es el método plantilla y `aplica` es el paso abstracto |
+| Clases concretas | `DescuentoPorPagoEfectivo` y `DescuentoPorDiaDeSemana`, que implementan `aplica` |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class DescuentoPorcentual {
+        <<abstract>>
+        -porcentaje: number
+        +calcularDescuento(pedido) number
+        #aplica(pedido)* boolean
+    }
+    DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
+    DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+```
+
+**Justificación.**
+
+- **Ventaja:** el cálculo del porcentaje está en un único lugar, y cada subclase solo expresa su condición.
+- **Limitación:** sirve para descuentos *porcentuales*. Un descuento de monto fijo implementaría `Descuento` directamente.
+
+### 5. Chain of Responsibility
+
+**Categoría:** comportamiento.
+
+**Problema.** El enunciado pide que *"si en el futuro agrega una estación nueva, esto no implique reescribir la lógica ya existente de las demás estaciones"*. Cada ítem tiene que llegar a la estación que lo prepara.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Manejador | `Estacion` (abstracta: `recibir`, `acepta`, `setSiguiente`) |
+| Manejadores concretos | `Parrilla`, `Barra`, `CocinaFria`, `CocinaDulce` |
+| Armado de la cadena | `CadenaEstaciones` |
+| Emisor | `GestorPedidos`, que solo conoce la primera estación |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Estacion {
+        <<abstract>>
+        -siguiente: Estacion
+        -items: ItemPedido[]
+        +recibir(item) void
+        +iniciarSiguiente() ItemPedido
+        +finalizar(item) void
+        #acepta(item) boolean
+    }
+    Estacion --> Estacion : siguiente
+    Estacion <|-- Parrilla
+    Estacion <|-- Barra
+    Estacion <|-- CocinaFria
+    Estacion <|-- CocinaDulce
+    CadenaEstaciones --> Estacion : arma
+    GestorPedidos --> Estacion : primeraEstacion
+```
+
+**Justificación.**
+
+- **Ventajas:**
+  - El gestor no sabe cuántas estaciones existen ni qué prepara cada una.
+  - Una estación nueva se suma con una subclase y una línea en `CadenaEstaciones`, sin modificar las demás.
+  - Cada estación mantiene su propia cola FIFO.
+- **Costos:**
+  - Un ítem recorre la cadena hasta encontrar su estación.
+  - Si ninguna lo acepta, se lanza `ErrorEstacionNoEncontrada`.
+
+### 6. Memento
+
+**Categoría:** comportamiento.
+
+**Problema.** El enunciado plantea que *"el mozo necesita poder 'borrar' lo escrito hasta alcanzar el ítem a corregir"* sin descartar el pedido. Hay que poder volver atrás varios pasos, y solo mientras el pedido está en construcción.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Originador | `Pedido` (guarda y restaura su lista de productos) |
+| Memento | Una copia de la lista de productos (`Producto[]`) |
+| Cuidador | La pila `Pedido.historial` |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Pedido {
+        -productos: Producto[]
+        -historial: Producto[][]
+        -guardarEstado() void
+        +agregarProducto(producto) void
+        +eliminarProducto(producto) void
+        +deshacerUltimaAccion() void
+    }
+```
+
+**Justificación.**
+
+- **Ventajas:**
+  - Antes de cada cambio se guarda una copia del estado, y deshacer la recupera de la pila (LIFO).
+  - Se puede retroceder varios pasos.
+  - No hace falta saber qué operación se hizo, porque siempre se restaura el estado anterior completo.
+- **Limitaciones:**
+  - Es una versión simplificada del patrón: el cuidador vive dentro del propio `Pedido` y el memento es una copia del arreglo, no una clase propia.
+  - Guarda una copia por cada cambio, aunque para el tamaño de un pedido es despreciable.
+
+---
+
+## Manejo de errores
+
+Los errores del dominio forman una jerarquía propia:
+
+```text
+Error
+└── ErrorRestaurante (abstracta)
+    ├── pedido/   ErrorPedidoNoExiste, ErrorPedidoEstadoIncorrecto, ErrorPedidoYaFacturado,
+    │             ErrorPedidoSinProductos, ErrorPedidoItemsNoListos, ErrorPedidoNoExisteMedioDePago,
+    │             ErrorItemPedidoEstadoIncorrecto, ErrorPedidoSinAccionesParaDeshacer
+    ├── estacion/ ErrorEstacionNoEncontrada, ErrorEstacionSinItems, ErrorEstacionItemNoEnPreparacion
+    └── menu/     ErrorComboMinimoItems
+```
+
+Cada excepción arma su mensaje con los datos del caso, como el número de pedido, el ítem o la estación. Quien usa el sistema puede atrapar todos los errores propios con un único `catch (error) { if (error instanceof ErrorRestaurante) … }` y relanzar cualquier otro error.
+
+## Diagramas
+
+Los diagramas están en la carpeta `diagramas/`, en formato PlantUML:
+
+- [`clasesTP.puml`](diagramas/clasesTP.puml): diagrama de clases de la solución.
+- Diagramas de secuencia: _pendiente_.
+
+Para verlos en VS Code, instalar la extensión **PlantUML** y abrir el archivo con `Alt + D`.

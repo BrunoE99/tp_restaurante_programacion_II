@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza al facturar un pedido que no tiene ningun medio de pago.
  * 
- * @see {@link Pedido.facturarPedido}
+ * @see {@link pedido/pedido!Pedido.facturarPedido}
  */
 export class ErrorPedidoNoExisteMedioDePago extends ErrorRestaurante {
 

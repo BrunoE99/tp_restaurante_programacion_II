@@ -71,7 +71,7 @@ export abstract class Pedido {
      * Asigna o cambia el medio de pago. Se puede hacer en estado: `EN_CONSTRUCCION` y `CONFIRMADO`.
      * 
      * @param medioPago Medio de pago elegido por el cliente.
-     * @throws {@link ErrorPedidoYaFacturado} Si el pedido ya se encuentra `FACTURADO`.
+     * @throws Lanza {@link ErrorPedidoYaFacturado} Si el pedido ya se encuentra `FACTURADO`.
      */
     public setMedioDePago(medioPago: IMediosDePago): void {
         this.validarPedidoNoFacturado();
@@ -138,7 +138,7 @@ export abstract class Pedido {
      * Agrega un producto, item o combo, al pedido y recalcula el precio.
      * 
      * @param producto Producto a agregar.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
      */
     public agregarProducto(producto: Producto): void {
 
@@ -153,7 +153,7 @@ export abstract class Pedido {
      * Elimina un producto del pedido y recalcula el precio. Si el producto no esta en el pedido, no lo modifica.
      * 
      * @param producto Producto a eliminar.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
      */
     public eliminarProducto(producto: Producto): void {
 
@@ -175,8 +175,8 @@ export abstract class Pedido {
      * y recalculando el precio total.
      * Se puede llamar varias veces seguidas para retroceder paso a paso.
      * 
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
-     * @throws {@link ErrorPedidoSinAccionesParaDeshacer} Si no hay modificaciones para deshacer.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link ErrorPedidoSinAccionesParaDeshacer} Si no hay modificaciones para deshacer.
      */
     public deshacerUltimaAccion(): void {
 
@@ -205,8 +205,8 @@ export abstract class Pedido {
      * Confirma el pedido, descompone cada producto en sus items individuales para crear los {@link ItemPedido}
      * que envia a la cadena de estaciones y cambia el estado a `CONFIRMADO`.
      * 
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
-     * @throws {@link ErrorPedidoSinProductos} Si el pedido no tiene productos.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_sin_productos!ErrorPedidoSinProductos} Si el pedido no tiene productos.
      */
     public confirmarPedido(): void {
 
@@ -230,7 +230,7 @@ export abstract class Pedido {
     /**
      * Valida que el pedido este `EN_CONSTRUCCION`.
      * 
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta `EN_CONSTRUCCION`.
      */
     private validarPedidoEnConstruccion(): void {
         if (this.estadoDelPedido !== EstadoPedido.EN_CONSTRUCCION) {
@@ -241,7 +241,7 @@ export abstract class Pedido {
     /**
      * Valida que el pedido no este `FACTURADO`.
      * 
-     * @throws {@link ErrorPedidoYaFacturado} Si el pedido esta en `FACTURADO`.
+     * @throws Lanza {@link ErrorPedidoYaFacturado} Si el pedido esta en `FACTURADO`.
      */
     private validarPedidoNoFacturado(): void {
         if (this.estadoDelPedido === EstadoPedido.FACTURADO) {
@@ -253,9 +253,9 @@ export abstract class Pedido {
      * Valida que el pedido este en `CONFIRMADO`, que todos los items esten `LISTO` y que el pedido
      * tenga un medio de pago asignado; para luego facturar el pedido (`CONFIRMADO` -> `FACTURADO`).
      * 
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido no esta en `CONFIRMADO`.
-     * @throws {@link ErrorPedidoItemsNoListos} Si algun item todavia no esta en `LISTO`.
-     * @throws {@link ErrorPedidoNoExisteMedioDePago} Si no se asigno un medio de pago.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido no esta en `CONFIRMADO`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_items_no_listos!ErrorPedidoItemsNoListos} Si algun item todavia no esta en `LISTO`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_no_existe_medio_pago!ErrorPedidoNoExisteMedioDePago} Si no se asigno un medio de pago.
      */
     public facturarPedido(): void {
         if (this.estadoDelPedido !== EstadoPedido.CONFIRMADO) {

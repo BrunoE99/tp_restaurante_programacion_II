@@ -3,8 +3,8 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza cuando se intenta una operacion sobre un pedido que no existe.
  * 
- * @see {@link GestorPedidos.consultarHistorialPedido}
- * @see {@link GestorPedidos.buscarPedidoEnCurso}
+ * @see {@link pedido/gestor_pedidos!GestorPedidos.consultarHistorialPedido}
+ * @see {@link pedido/gestor_pedidos!GestorPedidos.getPedidoEnCurso}
  */
 export class ErrorPedidoNoExiste extends ErrorRestaurante {
 

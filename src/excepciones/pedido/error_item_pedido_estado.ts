@@ -4,8 +4,8 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza cuando se intenta una operacion sobre un itemPedido que no esta en el estado que esa operacion necesita.
  * 
- * @see {@link ItemPedido.iniciarPreparacion}
- * @see {@link ItemPedido.marcarListo}
+ * @see {@link pedido/item_pedido!ItemPedido.iniciarPreparacion}
+ * @see {@link pedido/item_pedido!ItemPedido.marcarListo}
  */
 export class ErrorItemPedidoEstadoIncorrecto extends ErrorRestaurante {
 

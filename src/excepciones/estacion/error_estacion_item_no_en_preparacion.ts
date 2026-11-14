@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza cuando se intenta una operacion sobre un item que no esta en el estado `EN_PREPARACION` en la estacion.
  * 
- * @see {@link Estacion.finalizar}
+ * @see {@link estacion/estacion!default.finalizar}
  */
 export class ErrorEstacionItemNoEnPreparacion extends ErrorRestaurante {
 

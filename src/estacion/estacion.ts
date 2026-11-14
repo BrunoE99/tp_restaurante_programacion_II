@@ -66,7 +66,7 @@ export default abstract class Estacion {
      * 
      * @param item Item a asignar de un pedido.
      * 
-     * @throws {@link ErrorEstacionNoEncontrada} Si el item recorre toda la cadena 
+     * @throws Lanza {@link excepciones/estacion/error_estacion_no_encontrada!ErrorEstacionNoEncontrada} Si el item recorre toda la cadena 
      * y ninguna estacion acepta su categoria.
      */
     public recibir(item: ItemPedido): void {
@@ -96,8 +96,8 @@ export default abstract class Estacion {
      * pasa de `PENDIENTE` a `EN_PREPARACION`.
      * 
      * @returns El item que comenzo a prepararse
-     * @throws {@link ErrorEstacionSinItems} Si la cola esta vacia.
-     * @throws {@link ErrorItemPedidoEstadoIncorrecto} Si el item no esta `PENDIENTE`.
+     * @throws Lanza {@link ErrorEstacionSinItems} Si la cola esta vacia.
+     * @throws Lanza {@link excepciones/pedido/error_item_pedido_estado!ErrorItemPedidoEstadoIncorrecto} Si el item no esta `PENDIENTE`.
      */
     public iniciarSiguiente(): ItemPedido {
         const item = this.items.shift();
@@ -117,8 +117,8 @@ export default abstract class Estacion {
      * en preparacion de la estacion.
      * 
      * @param item Item que esta `EN_PREPARACION` y se quiere finalizar su preparacion.
-     * @throws {@link ErrorEstacionItemNoEnPreparacion} Si el item no esta siendo preparado en esta estacion.
-     * @throws {@link ErrorItemPedidoEstadoIncorrecto} Si el item no esta en estado `EN_PREPARACION`.
+     * @throws Lanza {@link ErrorEstacionItemNoEnPreparacion} Si el item no esta siendo preparado en esta estacion.
+     * @throws Lanza {@link excepciones/pedido/error_item_pedido_estado!ErrorItemPedidoEstadoIncorrecto} Si el item no esta en estado `EN_PREPARACION`.
      */
     public finalizar(item: ItemPedido): void {
         const posicion = this.itemsEnPreparacion.indexOf(item);

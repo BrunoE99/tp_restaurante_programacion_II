@@ -73,7 +73,7 @@ export class ItemPedido {
     /**
      * Inicia la preparacion del item: `PENDIENTE` -> `EN_PREPARACION`.
      * 
-     * @throws {@link ErrorItemPedidoEstadoIncorrecto} Si el item no esta en `PENDIENTE`.
+     * @throws Lanza {@link excepciones/pedido/error_item_pedido_estado!ErrorItemPedidoEstadoIncorrecto} Si el item no esta en `PENDIENTE`.
      */
     public iniciarPreparacion(): void {
         if (this.estado !== EstadoItem.PENDIENTE) {
@@ -86,7 +86,7 @@ export class ItemPedido {
     /**
      * Finaliza la preparacion del item: `EN_PREPARACION` -> `LISTO`.
      * 
-     * @throws {@link ErrorItemPedidoEstadoIncorrecto} Si el item no esta en `EN_PREPARACION`.
+     * @throws Lanza {@link excepciones/pedido/error_item_pedido_estado!ErrorItemPedidoEstadoIncorrecto} Si el item no esta en `EN_PREPARACION`.
      */
     public marcarListo(): void {
         if (this.estado !== EstadoItem.EN_PREPARACION) {

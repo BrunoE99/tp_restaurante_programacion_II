@@ -5,7 +5,7 @@ import { ErrorRestaurante } from "../error_restaurante";
  * modificaciones para deshacer (si no se agregaron ni quitaron productos, o si ya se
  * deshicieron todas).
  * 
- * @see {@link Pedido.deshacerUltimaAccion}
+ * @see {@link pedido/pedido!Pedido.deshacerUltimaAccion}
  */
 export class ErrorPedidoSinAccionesParaDeshacer extends ErrorRestaurante {
 

@@ -27,7 +27,7 @@ export class GestorPedidos {
     private facturas: Map<number, Factura>;
 
     /**
-     * @param primeraEstacion Primera estacion de la cadena de estaciones de cocina {@link CadenaEstaciones}.
+     * @param primeraEstacion Primera estacion de la cadena de estaciones de cocina {@link estacion/cadenaEstaciones!CadenaEstaciones}.
      * @param selectorDeDescuento Evaluador de promociones al momento de facturar {@link SelectorDeDescuento}.
      */
     public constructor(primeraEstacion: Estacion, selectorDeDescuento: SelectorDeDescuento) {
@@ -57,7 +57,7 @@ export class GestorPedidos {
     /**
      * @param numero Numero del pedido.
      * @returns El pedido en curso con ese numero.
-     * @throws {@link ErrorPedidoNoExiste} Si no existe un pedido en curso con ese numero.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no existe un pedido en curso con ese numero.
      */
     public getPedidoEnCurso(numero: number): Pedido {
         return this.buscarPedidoEnCurso(numero);
@@ -68,7 +68,7 @@ export class GestorPedidos {
      * 
      * @param numero Numero del pedido.
      * @param medioPago Medio de pago con el que el cliente pagara.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay un pedido en curso con ese numero.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay un pedido en curso con ese numero.
      */
     public pedidoPago(numero: number, medioPago: IMediosDePago): void {
         this.buscarPedidoEnCurso(numero).setMedioDePago(medioPago);
@@ -88,7 +88,7 @@ export class GestorPedidos {
      * 
      * @param numPedido Numero del pedido.
      * @returns El pedido facturado con ese numero.
-     * @throws {@link ErrorPedidoNoExiste} Si el numero no corresponde a ningun pedido en el historial.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si el numero no corresponde a ningun pedido en el historial.
      */
     public consultarHistorialPedido(numPedido: number): Pedido {
         const pedidoConsultado = this.historialDePedidos.get(numPedido);
@@ -103,7 +103,7 @@ export class GestorPedidos {
     /**
      * @param numPedido Numero del pedido.
      * @returns La factura generada al facturar el pedido.
-     * @throws {@link ErrorPedidoNoExiste} Si ese numero de pedido no tiene factura asociada.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si ese numero de pedido no tiene factura asociada.
      */
     public consultarFactura(numPedido: number): Factura {
         const factura = this.facturas.get(numPedido);
@@ -120,8 +120,8 @@ export class GestorPedidos {
      * 
      * @param numero Numero del pedido.
      * @param producto Producto, item o combo, a agregar.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
      */
     public agregarProducto(numero: number, producto: Producto): void {
         this.buscarPedidoEnCurso(numero).agregarProducto(producto);
@@ -132,8 +132,8 @@ export class GestorPedidos {
      * 
      * @param numero Numero del pedido.
      * @param producto Producto, item o combo, a eliminar.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
      */
     public eliminarProducto(numero: number, producto: Producto): void {
         this.buscarPedidoEnCurso(numero).eliminarProducto(producto);
@@ -143,10 +143,10 @@ export class GestorPedidos {
      * Confirma un pedido en curso y envia sus items individuales a la primera estacion de la cadena.
      * 
      * @param numero Numero de pedido.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
-     * @throws {@link ErrorPedidoSinProductos} Si el pedido no tiene productos.
-     * @throws {@link ErrorEstacionNoEncontrada} Si algun item no tiene estacion que lo prepare.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_sin_productos!ErrorPedidoSinProductos} Si el pedido no tiene productos.
+     * @throws Lanza {@link excepciones/estacion/error_estacion_no_encontrada!ErrorEstacionNoEncontrada} Si algun item no tiene estacion que lo prepare.
      */
     public confirmarPedido(numero: number): void {
         const pedido = this.buscarPedidoEnCurso(numero);
@@ -161,10 +161,10 @@ export class GestorPedidos {
      * 
      * @param numero Numero del pedido.
      * @returns La factura generada.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
-     * @throws {@link ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
-     * @throws {@link ErrorPedidoItemsNoListos} Si algun item todavia no esta `LISTO`.
-     * @throws {@link ErrorPedidoNoExisteMedioDePago} Si no existe medio de pago.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_estado!ErrorPedidoEstadoIncorrecto} Si el pedido ya no esta `EN_CONSTRUCCION`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_items_no_listos!ErrorPedidoItemsNoListos} Si algun item todavia no esta `LISTO`.
+     * @throws Lanza {@link excepciones/pedido/error_pedido_no_existe_medio_pago!ErrorPedidoNoExisteMedioDePago} Si no existe medio de pago.
      */
     public facturarPedido(numero: number): Factura {
         const pedido = this.buscarPedidoEnCurso(numero);
@@ -182,7 +182,7 @@ export class GestorPedidos {
      * 
      * @param numPedido Numero de pedido a buscar.
      * @returns Pedido encontrado con el numero correspondiente.
-     * @throws {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
+     * @throws Lanza {@link ErrorPedidoNoExiste} Si no hay pedido en curso con ese numero.
      */
     private buscarPedidoEnCurso(numPedido: number): Pedido {
         const pedido = this.pedidosEnCurso.get(numPedido);

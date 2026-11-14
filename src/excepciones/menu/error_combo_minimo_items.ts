@@ -3,7 +3,7 @@ import { ErrorRestaurante } from "../error_restaurante";
 /**
  * Se lanza cuando se intenta crear un combo con una cantidad de items menor al minimo.
  * 
- * @see {@link Combo.constructor}
+ * @see {@link menu/combo!Combo.constructor}
  */
 export class ErrorComboMinimoItems extends ErrorRestaurante {
 
