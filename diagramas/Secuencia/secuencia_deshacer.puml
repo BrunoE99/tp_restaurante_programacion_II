@@ -1,0 +1,40 @@
+@startuml Deshacer ultima accion
+
+actor Mozo
+participant "gestor : GestorPedidos" as Gestor
+participant "pedido : Pedido" as Pedido
+
+Mozo -> Gestor : agregarProducto(numero, gaseosa)
+activate Gestor
+Gestor -> Pedido : agregarProducto(gaseosa)
+activate Pedido
+Pedido -> Pedido : validarPedidoEnConstruccion()
+Pedido -> Pedido : guardarEstado()
+note right : apila una copia de\nproductos en historial
+Pedido -> Pedido : calcularPrecio()
+Pedido --> Gestor
+deactivate Pedido
+Gestor --> Mozo
+deactivate Gestor
+
+== El mozo se da cuenta del error y quiere deshacer ==
+
+Mozo -> Gestor : getPedidoEnCurso(numero)
+activate Gestor
+Gestor --> Mozo : pedido
+deactivate Gestor
+
+Mozo -> Pedido : deshacerUltimaAccion()
+activate Pedido
+Pedido -> Pedido : validarPedidoEnConstruccion()
+
+alt historial vacio
+    Pedido --> Mozo : ErrorPedidoSinAccionesParaDeshacer
+else hay acciones para deshacer
+    Pedido -> Pedido : productos = historial.pop()
+    Pedido -> Pedido : calcularPrecio()
+    Pedido --> Mozo
+end
+deactivate Pedido
+
+@enduml

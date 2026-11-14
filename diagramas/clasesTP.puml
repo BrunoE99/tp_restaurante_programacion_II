@@ -1,0 +1,582 @@
+@startuml Trabajo practico
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+set separator none
+hide empty members
+
+' Colores por patron (ver leyenda al final)
+!$FACTORY  = "#DCEBFA"
+!$COMPOSITE = "#DDF2E0"
+!$STRATEGY = "#FDEBD3"
+!$TEMPLATE = "#EADCF2"
+!$COR      = "#F8DADA"
+
+' =====================================================================
+' enums
+' =====================================================================
+
+package enums {
+    enum Categoria {
+        CARNE
+        ENSALADA
+        BEBIDA
+        POSTRE
+    }
+
+    enum EstadoItem {
+        PENDIENTE
+        EN_PREPARACION
+        LISTO
+    }
+
+    enum EstadoPedido {
+        EN_CONSTRUCCION
+        CONFIRMADO
+        FACTURADO
+    }
+
+    enum DiaSemana {
+        DOMINGO
+        LUNES
+        MARTES
+        MIERCOLES
+        JUEVES
+        VIERNES
+        SABADO
+    }
+}
+
+' =====================================================================
+' pedido
+' =====================================================================
+
+package pedido {
+    class GestorPedidos <<Factory Method>> <<Chain of Responsibility>> {
+        - pedidosEnCurso: Map<number, Pedido>
+        - historialDePedidos: Map<number, Pedido>
+        - primeraEstacion: Estacion
+        - numerador: NumeradorPedidos
+        - selectorDeDescuento: SelectorDeDescuento
+        - facturas: Map<number, Factura>
+
+        + registrarPedido(fabrica: FabricaPedido): number
+        + getPedidoEnCurso(numero: number): Pedido
+        + pedidoPago(numero: number, medioPago: MediosDePago)
+        + getHistorial(): Pedido[]
+        + consultarHistorialPedido(numPedido: number): Pedido
+        + consultarFactura(numPedido: number): Factura
+        + agregarProducto(numero: number, producto: Producto)
+        + eliminarProducto(numero: number, producto: Producto)
+        + confirmarPedido(numero: number)
+        + facturarPedido(numero: number): Factura
+        - buscarPedidoEnCurso(numPedido: number): Pedido
+        - asignarAEstaciones(pedido: Pedido)
+    }
+
+    class NumeradorPedidos {
+        - ultimoNumero: number
+
+        + siguienteNumero(): number
+    }
+
+    abstract class Pedido <<Factory Method>> <<Strategy>> $FACTORY {
+        - numeroDePedido: number {readOnly}
+        - cliente: Cliente
+        - productos: Producto[]
+        - historial: Producto[][]
+        - precioTotal: number
+        - medioDePago: MediosDePago | undefined
+        - estadoDelPedido: EstadoPedido
+        - diaActual: DiaSemana
+        - itemsPedidos: ItemPedido[]
+
+        + getNumeroDePedido(): number
+        + getMedioDePago(): MediosDePago | undefined
+        + setMedioDePago(medioPago: MediosDePago)
+        + getEstadoPedido(): EstadoPedido
+        + getDiaActual(): DiaSemana
+        + getPrecioTotal(): number
+        + getProductos(): Producto[]
+        + todosItemsListos(): boolean
+        + getItemsAPreparar(): ItemPedido[]
+        + agregarProducto(producto: Producto)
+        + eliminarProducto(producto: Producto)
+        + deshacerUltimaAccion()
+        + confirmarPedido()
+        + facturarPedido()
+        # calcularPrecio()
+        - guardarEstado()
+        - validarPedidoEnConstruccion()
+        - validarPedidoNoFacturado()
+    }
+
+    class PedidoSalon <<Factory Method>> $FACTORY {
+        - numeroDeMesa: number
+    }
+
+    class PedidoRetiro <<Factory Method>> $FACTORY {
+        - horarioDeRetiro: number
+        - numeroDeTelefono: string
+    }
+
+    class PedidoEnvio <<Factory Method>> $FACTORY {
+        - direccionDeEntrega: string
+        - costoDeEnvio: number
+    }
+
+    class ItemPedido {
+        - item: Item
+        - estado: EstadoItem
+        - numeroPedido: number {readOnly}
+
+        + getItem(): Item
+        + getNombre(): string
+        + getCategoria(): Categoria
+        + getEstado(): EstadoItem
+        + getNumeroPedido(): number
+        + estaListo(): boolean
+        + iniciarPreparacion()
+        + marcarListo()
+    }
+
+    class Factura {
+        - numeroDePedido: number
+        - lineas: LineaFactura[]
+        - subtotal: number
+        - descuento: number
+        - total: number
+
+        + getNumeroDePedido(): number
+        + getLineas(): LineaFactura[]
+        + getSubtotal(): number
+        + getDescuento(): number
+        + getTotal(): number
+        + mostrarFactura()
+    }
+    note bottom of Factura
+        LineaFactura = { nombreProducto: string, precioProducto: number }
+        (tipo literal en el codigo, no es una clase)
+    end note
+
+    package fabrica {
+        interface FabricaPedido <<Factory Method>> $FACTORY {
+            + crearPedido(numero: number): Pedido
+        }
+
+        class FabricaPedidoSalon <<Factory Method>> $FACTORY {
+            - cliente: Cliente
+            - diaSem: CalculoDia
+            - numeroMesa: number
+            - mediosDePago: MediosDePago | undefined
+
+            + crearPedido(numero: number): Pedido
+        }
+
+        class FabricaPedidoRetiro <<Factory Method>> $FACTORY {
+            - cliente: Cliente
+            - diaSem: CalculoDia
+            - horarioRetiro: number
+            - numeroTel: string
+            - mediosDePago: MediosDePago | undefined
+
+            + crearPedido(numero: number): Pedido
+        }
+
+        class FabricaPedidoEnvio <<Factory Method>> $FACTORY {
+            - cliente: Cliente
+            - diaSem: CalculoDia
+            - direccion: string
+            - mediosDePago: MediosDePago | undefined
+
+            + crearPedido(numero: number): Pedido
+        }
+    }
+}
+
+' =====================================================================
+' menu
+' =====================================================================
+
+package menu {
+    class Menu {
+        - items: Item[]
+        - combos: Combo[]
+
+        + agregarItem(item: Item)
+        + eliminarItem(item: Item)
+        + consultarItems(): Item[]
+        + agregarCombo(combo: Combo)
+        + eliminarCombo(combo: Combo)
+        + consultarCombos(): Combo[]
+    }
+
+    interface Producto <<Composite>> $COMPOSITE {
+        + getPrecio(): number
+        + getItems(): Item[]
+        + getNombre(): string
+    }
+
+    class Item <<Composite>> $COMPOSITE {
+        - nombre: string
+        - precio: number
+        - categoria: Categoria
+
+        + getNombre(): string
+        + getPrecio(): number
+        + getCategoria(): Categoria
+        + getItems(): Item[]
+    }
+
+    class Combo <<Composite>> <<Strategy>> $COMPOSITE {
+        - minimoItems: number {readOnly}
+        - nombre: string
+        - items: Item[]
+        - beneficio: Beneficio
+
+        + getNombre(): string
+        + getItems(): Item[]
+        + getPrecio(): number
+        - getPrecioTotalItems(): number
+    }
+}
+
+' =====================================================================
+' beneficio (beneficios de combos y descuentos del pedido)
+' =====================================================================
+
+package beneficio {
+    interface Beneficio <<Strategy>> $STRATEGY {
+        + calcularBeneficio(sumaDeProductos: number): number
+    }
+
+    class BeneficioPorPorcentaje <<Strategy>> $STRATEGY {
+        - porcentaje: number
+
+        + calcularBeneficio(sumaDeProductos: number): number
+    }
+
+    class BeneficioPorPrecioFijo <<Strategy>> $STRATEGY {
+        - precioFijo: number
+
+        + calcularBeneficio(): number
+    }
+
+    class SelectorDeDescuento <<Strategy>> $STRATEGY {
+        - descuentos: Descuento[]
+
+        + obtenerMejorDescuento(pedido: Pedido): number
+        + calcularTotalACobrar(pedido: Pedido): number
+    }
+
+    interface Descuento <<Strategy>> $STRATEGY {
+        + calcularDescuento(pedido: Pedido): number
+    }
+
+    abstract class DescuentoPorcentual <<Template Method>> <<Strategy>> $TEMPLATE {
+        - porcentaje: number
+
+        # getPorcentaje(): number
+        + calcularDescuento(pedido: Pedido): number
+        # {abstract} aplica(pedido: Pedido): boolean
+    }
+
+    class DescuentoPorPagoEfectivo <<Template Method>> $TEMPLATE {
+        # aplica(pedido: Pedido): boolean
+    }
+
+    class DescuentoPorDiaDeSemana <<Template Method>> $TEMPLATE {
+        - diaQueAplica: DiaSemana
+
+        # aplica(pedido: Pedido): boolean
+    }
+
+    note right of DescuentoPorcentual::calcularDescuento
+        Metodo plantilla: si aplica(pedido) es false
+        devuelve 0; si no, total * porcentaje / 100
+    end note
+}
+
+' =====================================================================
+' medios_de_pago
+' =====================================================================
+
+package medios_de_pago {
+    interface MediosDePago <<Strategy>> $STRATEGY {
+        + pagoCompletado()
+        + aplicaDescuentoEfectivo(): boolean
+    }
+
+    abstract class AbstractTarjeta <<Strategy>> $STRATEGY {
+        - medioDePago: MediosDePago
+        - numeroTarjeta: string
+        - nombreTitular: string
+        - codigoSeguridad: string
+        - fechaVencimiento: string
+        - saldo: number
+        - calificaDescuentoEfectivo: boolean {readOnly}
+
+        + {abstract} pagoCompletado()
+        + aplicaDescuentoEfectivo(): boolean
+    }
+
+    class TarjetaCredito <<Strategy>> $STRATEGY {
+        - mensajePago: string {readOnly}
+
+        + pagoCompletado()
+    }
+
+    class TarjetaDebito <<Strategy>> $STRATEGY {
+        - mensajePago: string {readOnly}
+
+        + pagoCompletado()
+    }
+
+    class Efectivo <<Strategy>> $STRATEGY {
+        - mensajePago: string {readOnly}
+        - calificaDescuentoEfectivo: boolean {readOnly}
+
+        + pagoCompletado()
+        + aplicaDescuentoEfectivo(): boolean
+    }
+
+    class BilleteraVirtual <<Strategy>> $STRATEGY {
+        - mensajePago: string {readOnly}
+        - calificaDescuentoEfectivo: boolean {readOnly}
+
+        + pagoCompletado()
+        + aplicaDescuentoEfectivo(): boolean
+    }
+}
+
+' =====================================================================
+' estacion
+' =====================================================================
+
+package estacion {
+    abstract class Estacion <<Chain of Responsibility>> $COR {
+        - siguiente: Estacion | undefined
+        - items: ItemPedido[]
+        - itemsEnPreparacion: ItemPedido[]
+        - categorias: Categoria[]
+        - nombre: string {readOnly}
+
+        + getNombre(): string
+        + setSiguiente(estacion: Estacion)
+        + recibir(item: ItemPedido)
+        + tieneItemsEnCola(): boolean
+        + iniciarSiguiente(): ItemPedido
+        + finalizar(item: ItemPedido)
+        # acepta(item: ItemPedido): boolean
+    }
+
+    class Parrilla <<Chain of Responsibility>> $COR
+    class Barra <<Chain of Responsibility>> $COR
+    class CocinaFria <<Chain of Responsibility>> $COR
+    class CocinaDulce <<Chain of Responsibility>> $COR
+
+    class CadenaEstaciones <<Chain of Responsibility>> {
+        - primeraEstacion: Estacion
+        - estaciones: Estacion[]
+
+        + getPrimeraEstacion(): Estacion
+        + getEstaciones(): Estacion[]
+    }
+
+    note right of Estacion::recibir
+        Si acepta(item), lo encola;
+        si no, lo delega en siguiente.recibir(item)
+    end note
+}
+
+' =====================================================================
+' empleados-cliente
+' =====================================================================
+
+package "empleados-cliente" {
+    class Cliente {
+        - mesaAsignada: number
+
+        + getMesaAsignada(): number
+        + setMesaAsignada(mesaAsignada: number)
+    }
+
+    abstract class Empleado {
+        - clientes: Cliente[]
+        - pedidos: Pedido[]
+
+        + setClientes(clientes: Cliente[])
+        + getClientes(): Cliente[]
+        + setPedidos(pedidos: Pedido[])
+        + getPedidos(): Pedido[]
+    }
+
+    class Mozo {
+        - gestorDePedidos: GestorPedidos
+    }
+
+    class Cadete
+}
+
+' =====================================================================
+' calculo_dia
+' =====================================================================
+
+package calculo_dia {
+    class CalculoDia {
+        - fecha: Date
+
+        + calculoDia(): DiaSemana
+    }
+}
+
+' =====================================================================
+' excepciones
+' =====================================================================
+
+package excepciones {
+    abstract class ErrorRestaurante {
+        + getMensaje(): string
+    }
+
+    class Error <<JS nativo>>
+
+    package "excepciones.pedido" {
+        class ErrorPedidoNoExiste
+        class ErrorPedidoEstadoIncorrecto
+        class ErrorPedidoYaFacturado
+        class ErrorPedidoSinProductos
+        class ErrorPedidoItemsNoListos
+        class ErrorPedidoNoExisteMedioDePago
+        class ErrorPedidoSinAccionesParaDeshacer
+        class ErrorItemPedidoEstadoIncorrecto
+    }
+
+    package "excepciones.estacion" {
+        class ErrorEstacionNoEncontrada
+        class ErrorEstacionSinItems
+        class ErrorEstacionItemNoEnPreparacion
+    }
+
+    package "excepciones.menu" {
+        class ErrorComboMinimoItems
+    }
+}
+
+' =====================================================================
+' relaciones
+' =====================================================================
+
+' --- GestorPedidos
+GestorPedidos o-- Pedido
+GestorPedidos *-- NumeradorPedidos
+GestorPedidos *-- Factura
+GestorPedidos --> SelectorDeDescuento
+GestorPedidos --> Estacion : primeraEstacion
+GestorPedidos ..> FabricaPedido : usa
+
+Factura ..> Pedido
+
+' --- Factory Method
+FabricaPedido <|.. FabricaPedidoSalon
+FabricaPedido <|.. FabricaPedidoRetiro
+FabricaPedido <|.. FabricaPedidoEnvio
+FabricaPedido ..> Pedido
+FabricaPedidoSalon ..> PedidoSalon : crea
+FabricaPedidoRetiro ..> PedidoRetiro : crea
+FabricaPedidoEnvio ..> PedidoEnvio : crea
+
+Pedido <|-- PedidoSalon
+Pedido <|-- PedidoRetiro
+Pedido <|-- PedidoEnvio
+
+' --- Pedido
+Pedido o-- Producto
+Pedido *-- ItemPedido
+Pedido --> Cliente
+Pedido --> MediosDePago
+Pedido ..> CalculoDia
+ItemPedido --> Item
+
+' --- Composite
+Producto <|.. Item
+Producto <|.. Combo
+Combo o-- Item
+
+Menu o-- Item
+Menu o-- Combo
+
+' --- Strategy (beneficio de combos)
+Combo --> Beneficio
+Beneficio <|.. BeneficioPorPorcentaje
+Beneficio <|.. BeneficioPorPrecioFijo
+
+' --- Strategy (descuentos) + Template Method
+SelectorDeDescuento o-- Descuento
+Descuento <|.. DescuentoPorcentual
+DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
+DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+Descuento ..> Pedido
+
+' --- Strategy (medios de pago)
+MediosDePago <|.. AbstractTarjeta
+MediosDePago <|.. Efectivo
+MediosDePago <|.. BilleteraVirtual
+AbstractTarjeta <|-- TarjetaCredito
+AbstractTarjeta <|-- TarjetaDebito
+AbstractTarjeta --> MediosDePago : medioDePago
+
+' --- Chain of Responsibility
+Estacion --> Estacion : siguiente
+Estacion o-- ItemPedido
+Estacion <|-- Parrilla
+Estacion <|-- Barra
+Estacion <|-- CocinaFria
+Estacion <|-- CocinaDulce
+CadenaEstaciones *-- Estacion : arma
+
+' --- Empleados y cliente
+Empleado <|-- Mozo
+Empleado <|-- Cadete
+Empleado --> Cliente
+Empleado --> Pedido
+Mozo --> GestorPedidos
+
+' --- Excepciones
+Error <|-- ErrorRestaurante
+ErrorRestaurante <|-- ErrorPedidoNoExiste
+ErrorRestaurante <|-- ErrorPedidoEstadoIncorrecto
+ErrorRestaurante <|-- ErrorPedidoYaFacturado
+ErrorRestaurante <|-- ErrorPedidoSinProductos
+ErrorRestaurante <|-- ErrorPedidoItemsNoListos
+ErrorRestaurante <|-- ErrorPedidoNoExisteMedioDePago
+ErrorRestaurante <|-- ErrorPedidoSinAccionesParaDeshacer
+ErrorRestaurante <|-- ErrorItemPedidoEstadoIncorrecto
+ErrorRestaurante <|-- ErrorEstacionNoEncontrada
+ErrorRestaurante <|-- ErrorEstacionSinItems
+ErrorRestaurante <|-- ErrorEstacionItemNoEnPreparacion
+ErrorRestaurante <|-- ErrorComboMinimoItems
+
+ErrorPedidoNoExiste -[hidden]down- ErrorPedidoItemsNoListos
+ErrorPedidoEstadoIncorrecto -[hidden]down- ErrorPedidoNoExisteMedioDePago
+ErrorPedidoYaFacturado -[hidden]down- ErrorPedidoSinAccionesParaDeshacer
+ErrorPedidoSinProductos -[hidden]down- ErrorItemPedidoEstadoIncorrecto
+ErrorEstacionNoEncontrada -[hidden]down- ErrorEstacionSinItems
+ErrorEstacionSinItems -[hidden]down- ErrorEstacionItemNoEnPreparacion
+
+' =====================================================================
+' leyenda
+' =====================================================================
+
+legend right
+    |= Color |= Patron |= Participantes |
+    |<$FACTORY>       | Factory Method          | FabricaPedido, Fabricas concretas, Pedido y subclases |
+    |<$COMPOSITE>     | Composite               | Producto, Item, Combo |
+    |<$STRATEGY>      | Strategy                | Beneficio, Descuento, MediosDePago y sus implementaciones |
+    |<$TEMPLATE>      | Template Method         | DescuentoPorcentual y subclases |
+    |<$COR>           | Chain of Responsibility | Estacion y subclases |
+    Cada clase indica su patron con un estereotipo <<Patron>>.
+endlegend
+
+@enduml

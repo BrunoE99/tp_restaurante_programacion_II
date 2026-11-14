@@ -1,0 +1,28 @@
+import Cliente from "./cliente";
+import {Pedido} from "../pedido/pedido";
+
+export default abstract class Empleado {
+    private clientes: Cliente[];
+    private pedidos: Pedido[];
+
+    public constructor(clientes: Cliente[], pedidos: Pedido[]) {
+        this.clientes = clientes;
+        this.pedidos = pedidos;
+    }
+
+   public setClientes(clientes: Cliente[]): void {
+        this.clientes = clientes;
+    }
+
+    public getClientes(): Cliente[] {
+        return this.clientes;
+    }
+
+    public setPedidos(pedidos: Pedido[]): void {
+        this.pedidos = pedidos;
+    }
+
+    public getPedidos(): Pedido[] {
+        return this.pedidos;
+    }               
+}
