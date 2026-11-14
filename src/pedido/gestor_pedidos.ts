@@ -5,6 +5,8 @@ import Producto from "../menu/producto";
 import { NumeradorPedidos } from "./numerador_pedidos";
 import { FabricaPedido } from "./fabrica/fabrica_pedido";
 import { ErrorPedidoNoExiste } from "../excepciones/pedido/error_pedido_no_existe";
+import { SelectorDeDescuento } from "../beneficio/SelectorDeDescuento";
+import { Factura } from "./factura";
 
 export class GestorPedidos {
 
@@ -12,12 +14,16 @@ export class GestorPedidos {
     private historialDePedidos: Map<number, Pedido>;
     private primeraEstacion: Estacion;
     private numerador: NumeradorPedidos;
+    private selectorDeDescuento: SelectorDeDescuento;
+    private facturas: Map<number, Factura>;
 
-    public constructor(primeraEstacion: Estacion) {
+    public constructor(primeraEstacion: Estacion, selectorDeDescuento: SelectorDeDescuento) {
         this.pedidosEnCurso = new Map<number, Pedido>();
         this.historialDePedidos = new Map<number, Pedido>();
         this.primeraEstacion = primeraEstacion;
         this.numerador = new NumeradorPedidos();
+        this.selectorDeDescuento = selectorDeDescuento;
+        this.facturas = new Map<number, Factura>();
     }
 
     public registrarPedido(fabrica: FabricaPedido): number {
@@ -53,6 +59,16 @@ export class GestorPedidos {
         return pedidoConsultado;
     }
 
+     public consultarFactura(numPedido: number): Factura {
+        const factura = this.facturas.get(numPedido);
+
+        if (factura === undefined) {
+            throw new ErrorPedidoNoExiste(numPedido);
+        }
+
+        return factura;
+    }
+
     public agregarProducto(numero: number, producto: Producto): void {
         this.buscarPedidoEnCurso(numero).agregarProducto(producto);
     }
@@ -68,12 +84,15 @@ export class GestorPedidos {
         this.asignarAEstaciones(pedido);
     }
 
-    public facturarPedido(numero: number): void {
+    public facturarPedido(numero: number): Factura {
         const pedido = this.buscarPedidoEnCurso(numero);
 
         pedido.facturarPedido();
+        const factura = new Factura(pedido, this.selectorDeDescuento.obtenerMejorDescuento(pedido));
+        this.facturas.set(numero, factura);
         this.historialDePedidos.set(numero, pedido);
         this.pedidosEnCurso.delete(numero);
+        return factura;
     }
 
     private buscarPedidoEnCurso(numPedido: number): Pedido {

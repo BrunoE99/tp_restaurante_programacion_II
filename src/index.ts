@@ -12,10 +12,12 @@ import { CadenaEstaciones } from "./estacion/cadenaEstaciones";
 import { ErrorRestaurante } from "./excepciones/error_restaurante";
 import { FabricaPedido } from "./pedido/fabrica/fabrica_pedido";
 import Producto from "./menu/producto";
-import { EstadoPedido } from "./enums/estado_pedido";
 import { FabricaPedidoRetiro } from "./pedido/fabrica/fabrica_pedido_retiro";
 import BilleteraVirtual from "./medios_de_pago/billeteraVirtual";
 import { FabricaPedidoEnvio } from "./pedido/fabrica/fabrica_pedido_envio";
+import { DescuentoPorDiaDeSemana } from "./beneficio/DescuentoPorDiaDeSemana";
+import { SelectorDeDescuento } from "./beneficio/SelectorDeDescuento";
+import { DescuentoPorPagoEfectivo } from "./beneficio/DescuentoPorPagoEfectivo";
 
 // Creacion de items y combos
 const hamburguesa = new Item("Hamburguesa", 5000, Categoria.CARNE);
@@ -78,8 +80,7 @@ function mostrarHistorial(gestor: GestorPedidos): void {
   console.log("Historial de pedidos:");
 
   for (const pedido of gestor.getHistorial()) {
-    const estado = EstadoPedido[pedido.getEstadoPedido()];
-    console.log(`  Pedido ${pedido.getNumeroDePedido()}: $${pedido.getPrecioTotal()} (${estado})`);
+    gestor.consultarFactura(pedido.getNumeroDePedido()).mostrarFactura();
   }
 }
 
@@ -96,7 +97,8 @@ function manejarError(error: unknown): void {
 try {
   const menu = armarMenu();
   const cadena = new CadenaEstaciones();
-  const gestor = new GestorPedidos(cadena.getPrimeraEstacion());
+  const selector = new SelectorDeDescuento([ new DescuentoPorPagoEfectivo(), new DescuentoPorDiaDeSemana() ]);
+  const gestor = new GestorPedidos(cadena.getPrimeraEstacion(), selector);
 
   const [comboHamburguesa, comboParrillero] = menu.consultarCombos();
   const cliente = new Cliente(5);
