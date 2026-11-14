@@ -60,6 +60,10 @@ export abstract class Pedido {
     public getPrecioTotal(): number {
         return this.precioTotal;
     }
+
+    public getProductos(): Producto[] {
+        return [...this.productos];
+    }
     
     public todosItemsListos(): boolean {
 

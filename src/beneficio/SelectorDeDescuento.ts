@@ -10,7 +10,8 @@ export class SelectorDeDescuento {
     }
 
     public obtenerMejorDescuento(pedido: Pedido): number {
-        return this.descuentos.reduce((mejorDescuento, descuentoActual) => Math.max(mejorDescuento, descuentoActual.calcularDescuento(pedido)), 0);
+        return this.descuentos.reduce((mejorDescuento, descuentoActual) =>
+             Math.max(mejorDescuento, descuentoActual.calcularDescuento(pedido)), 0);
     }
 
     public calcularTotalACobrar(pedido: Pedido): number {
