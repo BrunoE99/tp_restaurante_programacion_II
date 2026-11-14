@@ -1,0 +1,59 @@
+@startuml Facturar pedido con el mejor descuento
+
+actor Mozo
+participant "gestor : GestorPedidos" as Gestor
+participant "pedido : Pedido" as Pedido
+participant "selector : SelectorDeDescuento" as Selector
+participant "descuento : Descuento" as Descuento
+participant "factura : Factura" as Factura
+
+Mozo -> Gestor : facturarPedido(numero)
+activate Gestor
+Gestor -> Gestor : buscarPedidoEnCurso(numero)
+
+Gestor -> Pedido : facturarPedido()
+activate Pedido
+alt no esta confirmado / items no listos / sin medio de pago
+    Pedido --> Gestor : excepcion
+    Gestor --> Mozo : excepcion
+else validaciones ok
+    Pedido -> Pedido : estado = FACTURADO
+    Pedido --> Gestor
+end
+deactivate Pedido
+
+Gestor -> Selector : obtenerMejorDescuento(pedido)
+activate Selector
+loop por cada descuento (efectivo, dia de semana)
+    Selector -> Descuento : calcularDescuento(pedido)
+    activate Descuento
+    Descuento -> Descuento : aplica(pedido)
+    alt aplica
+        Descuento -> Pedido : getPrecioTotal()
+        Pedido --> Descuento : total
+        Descuento --> Selector : total * porcentaje / 100
+    else no aplica
+        Descuento --> Selector : 0
+    end
+    deactivate Descuento
+    Selector -> Selector : Math.max(mejorDescuento, monto)
+end
+Selector --> Gestor : mejorDescuento
+deactivate Selector
+
+create Factura
+Gestor -> Factura : new Factura(pedido, mejorDescuento)
+activate Factura
+Factura -> Pedido : getProductos()
+Factura -> Pedido : getPrecioTotal()
+Factura -> Factura : total = subtotal - descuento
+Factura --> Gestor
+deactivate Factura
+
+Gestor -> Gestor : facturas.set(numero, factura)
+Gestor -> Gestor : historialDePedidos.set(numero, pedido)
+Gestor -> Gestor : pedidosEnCurso.delete(numero)
+Gestor --> Mozo : factura
+deactivate Gestor
+
+@enduml
