@@ -1,3 +1,16 @@
+/**
+ * Ejemplo de uso del sistema de gestion de pedidos de "Fogon del Barrio".
+ * 
+ * Configura el menu {@link Menu}, la cadena de estaciones {@link estacion/cadenaEstaciones!CadenaEstaciones},
+ * las estrategias de descuento {@link SelectorDeDescuento} y el gestor de pedidos 
+ * {@link pedido/gestor_pedidos!GestorPedidos}; ejecutando de un extermo a otro 
+ * el flujo de pedidos en salon, retiro y envio a domicilio.
+ * 
+ * Toda la logica va dentro de un unico `try` con los errores {@link ErrorRestaurante} manejandose
+ * en un unico `catch`.
+ * 
+ * @module index
+ */
 import { Item } from "./menu/item";
 import { Combo } from "./menu/combo";
 import { Menu } from "./menu/menu";
@@ -34,7 +47,11 @@ const comboParrillero = new Combo(
 
 const itemsDeLaCarta = [hamburguesa, bife, ensaladaCesar, gaseosa, flan];
 
-// Creacion de funciones para que el try/catch sea mas legible
+/**
+ * Crea el menu y agrega los items individuales y los combos definidos.
+ * 
+ * @returns El menu completo.
+ */
 function armarMenu(): Menu {
   const menu = new Menu();
 
@@ -48,6 +65,15 @@ function armarMenu(): Menu {
   return menu;
 }
 
+/**
+ * Registra un nuevo pedido con una fabrica concreta, le carga los productos y lo confirma, enviando
+ * sus items a las estaciones de la cocina.
+ * 
+ * @param gestor Gestor de pedidos.
+ * @param fabrica Fabrica de la modalidad, con sus datos particulares.
+ * @param productos Productos a cargar en el pedido.
+ * @returns Numero asignado al pedido.
+ */
 function registrarPedido(gestor: GestorPedidos, fabrica: FabricaPedido, productos: Producto[]): number {
   const numero = gestor.registrarPedido(fabrica);
 
@@ -60,6 +86,12 @@ function registrarPedido(gestor: GestorPedidos, fabrica: FabricaPedido, producto
   return numero;
 }
 
+/**
+ * Procesa todos los items pendientes en cada estacion de la cadena, en orden de llegada,
+ * mostrando por consola que prepara cada una.
+ * 
+ * @param cadena Cadena de estaciones de la cocina.
+ */
 function prepararEnCocina(cadena: CadenaEstaciones): void {
   for (const estacion of cadena.getEstaciones()) {
     while (estacion.tieneItemsEnCola()) {
@@ -70,12 +102,23 @@ function prepararEnCocina(cadena: CadenaEstaciones): void {
   }
 }
 
+/**
+ * Factura los pedidos y crea la factura.
+ * 
+ * @param gestor Gestor de pedidos.
+ * @param numeros Numeros de los pedidos a facturar.
+ */
 function facturar(gestor: GestorPedidos, numeros: number[]): void {
   for (const numero of numeros) {
     gestor.facturarPedido(numero);
   }
 }
 
+/**
+ * Recorre los pedidos en el historial del gestor e imprime por consola la factura de cada uno.
+ * 
+ * @param gestor Gestor de pedidos.
+ */
 function mostrarHistorial(gestor: GestorPedidos): void {
   console.log("Historial de pedidos:");
 
@@ -84,7 +127,12 @@ function mostrarHistorial(gestor: GestorPedidos): void {
   }
 }
 
-// Funcion para manejar los errores
+/**
+ * Maneja el error atrapandolo: si es un error del restaurante, muestra su mensaje; sino,
+ * lo vuelve a lanzar.
+ * 
+ * @param error Lo que se atrapo en el `catch`.
+ */
 function manejarError(error: unknown): void {
   if (error instanceof ErrorRestaurante) {
     console.error(error.getMensaje());

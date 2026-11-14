@@ -1,176 +1,320 @@
-# Configuración del entorno de desarrollo para Programación 2
+# Fogón del Barrio - Gestión de Pedidos
 
-Vamos a comentar cómo instalar todos los componentes necesarios sobre la máquina host.
+Trabajo práctico de Programación II, Grupo 5.
 
-## Instalar NodeJs
+Sistema en TypeScript para el restaurante "Fogón del Barrio". El sistema:
 
-1. Ingresar a [NodeJs - Descargas](https://nodejs.org/en/download/) y seleccionar según la plataforma en la que nos encontremos el instalador que mejor se adapte a nuestro sistema operativo.
+- toma pedidos en salón, para retirar y con envío;
+- reparte los ítems entre las estaciones de la cocina;
+- arma la cuenta aplicando el mejor descuento disponible;
+- guarda el historial de lo cobrado.
 
-👉 En el caso de Windows, seleccionar los instaladores que se encuentran en la pestaña "Prebuilt Installer"
+## Integrantes
 
+| Nombre | Usuario de GitHub |
+|---|---|
+| Bruno Enrigo | BrunoE99 |
+| Juan Francisco Damelio | juanfdamelio |
 
+## Instalación y ejecución
 
-👉 En el caso de MacOs o Linux, seleccionar la pestaña "Package Manager" y seleccionar "NVM" en el último combo. Luego copiar y ejecutar en una terminal los comandos que se muestran.
-
-
-
-⚠️ **En todos los casos seleccionar alguna versión estable (LTS)**
-
-## Directorio de trabajo
-
-Una vez instalado node, debemos crear el directorio en el cual vamos a desarrollar.
-Crear un directorio, que será el directorio del proyecto a utilizar y dentro del mismo descomprimir el archivo 📦 *bootstrap.zip*.
-
-Este archivo contiene lo siguiente:
-
-📂/
-
-- 📂 src: directorio donde crearemos todos los archivos typescript (\*.ts)
-  - 📄 index.ts: archivo de prueba. A futuro será nuestro punto de entrada.
-- 📂 tests: directorio donde crearemos las pruebas unitarias 
-- 📄 package.json: este archivo contiene los comandos a utilizar en el desarrollo y los paquetes necesarios para construir nuestra solución.
-- 📄 tsconfig.json: este archivo contiene la configuración utilizada en el proceso de "compilación"
-- 📄 jest.config.js: este archivo contiene la configuración utilizada durante la ejecución de las pruebas unitarias.
-- 📄 README.md: este archivo.
-
-## Instalar las dependencias
-
-Desde una terminal, ingresar al directorio de trabajo creado y ejecutar el siguiente comando: 
+Hace falta Node.js (versión LTS). Desde la carpeta del proyecto:
 
 ```bash
-# comando que permite instalar los paquetes especificados en el archivo package.json
-user@host:~$ npm i
+npm install          # instala las dependencias
+npm run dev-mode     # ejecuta la demo (src/index.ts) sin compilar
+npm run build        # corre ESLint y compila a dist/
+npm start            # ejecuta la versión compilada
+npm test             # compila y corre las pruebas
+npx jest --coverage  # corre las pruebas con reporte de cobertura (coverage/)
+npx typedoc          # genera la documentación JSDoc en docs/
 ```
 
-## Compilar el proyecto
+La demo registra tres pedidos, uno de cada modalidad:
 
-Desde una terminal, ingresar al directorio de trabajo creado y ejecutar el siguiente comando: 
+1. Los confirma.
+2. Hace que cada estación prepare sus ítems.
+3. Los factura.
+4. Muestra el historial con la factura de cada uno.
 
-```bash
-# comando que permite compilar la solución.
-user@host:~$ npm run build
+Las pruebas usan Jest y están en `tests/`. La cobertura supera el 80 %.
+
+## Estructura
+
+```text
+diagramas/   diagrama de clases y diagramas de secuencia (PlantUML)
+src/
+  beneficio/         beneficios de combos y descuentos del pedido
+  estacion/          estaciones de cocina y la cadena que las une
+  excepciones/       errores propios del sistema
+  medios_de_pago/    efectivo, tarjetas y billetera virtual
+  menu/              menú, ítems y combos
+  pedido/            pedidos, gestor, factura y fábricas de pedidos
+  index.ts           demo
+tests/       pruebas unitarias
 ```
 
-## Configurar VisualCode (IDE)
+## Funcionamiento
 
-Instalar los siguientes complementos:
+`GestorPedidos` es la clase desde la que se usa el sistema.
 
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
-* [JEST](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest)
-* [PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)
-* [Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)
-* [Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)
+**Estados del pedido.** Un pedido pasa por estos estados:
 
-# Reglas de estilo de código (ESLint)
-
-El proyecto incluye una configuración de ESLint (`eslint.config.js`) que estandariza el código. Para verificarla ejecutar:
-
-```bash
-# revisa el código en src/ y reporta errores
-user@host:~$ npm run lint
-
-# revisa el código y corrige automáticamente lo que se pueda
-user@host:~$ npm run lint-fix
+```text
+EN_CONSTRUCCION  →  CONFIRMADO  →  FACTURADO
 ```
 
-A continuación se muestran ejemplos de cada regla configurada.
+- **En construcción:** se pueden agregar y quitar productos, y deshacer la última modificación.
+- **Al confirmarlo:** cada producto se separa en sus ítems, y los de un combo también. Desde ese momento ya no admite cambios.
+- **Para facturarlo:** todos los ítems tienen que estar listos y tiene que tener un medio de pago.
 
-## Nombres de clases, interfaces y tipos (PascalCase)
+**Preparación en la cocina.** Cada ítem recorre la cadena de estaciones hasta llegar a la que prepara su categoría:
 
-| ❌ Incorrecto        | ✅ Correcto          |
-| ------------------- | ------------------- |
-| `class persona { }` | `class Persona { }` |
+| Estación | Prepara |
+|---|---|
+| Parrilla | Carnes |
+| Barra | Bebidas |
+| Cocina fría | Ensaladas |
+| Cocina dulce | Postres |
 
-## Nombres de constantes globales (UPPER_CASE)
+Cada estación atiende los ítems en el orden en que le llegaron. Cada ítem pasa por estos estados:
 
-| ❌ Incorrecto             | ✅ Correcto                |
-| ------------------------ | ------------------------- |
-| `const maxIntentos = 3;` | `const MAX_INTENTOS = 3;` |
+```text
+PENDIENTE  →  EN_PREPARACION  →  LISTO
+```
 
-## Nombres de variables y funciones (camelCase)
+**Precio y descuentos.**
 
-| ❌ Incorrecto                  | ✅ Correcto                   |
-| ----------------------------- | ---------------------------- |
-| `let Nombre_Usuario = "Ana";` | `let nombreUsuario = "Ana";` |
+- El precio de un combo es la suma de sus ítems con su beneficio aplicado, que puede ser un porcentaje o un precio fijo.
+- Al facturar se aplica un solo descuento, el más conveniente para el cliente:
+  - Pago en efectivo: 10 % por defecto.
+  - Día de la semana: lunes, 15 % por defecto.
 
-## Nombres de métodos de clase (camelCase)
+**Errores.** Los errores propios del sistema heredan de `ErrorRestaurante`, así que se pueden atrapar todos con un único `catch`.
 
-| ❌ Incorrecto                 | ✅ Correcto                   |
-| ---------------------------- | ---------------------------- |
-| `public Saludar(): void { }` | `public saludar(): void { }` |
+## Requerimientos funcionales
 
-## Longitud mínima de los nombres (mínimo 4 caracteres)
+| # | Requerimiento | Dónde se implementa |
+|---|---|---|
+| 1 | Registrar un pedido en alguna de las tres modalidades | `GestorPedidos.registrarPedido` y las fábricas de `pedido/fabrica/` |
+| 2 | Agregar y quitar productos mientras está en construcción | `Pedido.agregarProducto` / `eliminarProducto` |
+| 3 | Deshacer la última modificación | `Pedido.deshacerUltimaAccion` |
+| 4 | Confirmar y distribuir los ítems entre las estaciones | `GestorPedidos.confirmarPedido` y `Estacion.recibir` |
+| 5 | Procesar en orden de llegada y marcar el avance | `Estacion.iniciarSiguiente` / `finalizar` |
+| 6 | Impedir modificar un ítem en preparación | `Pedido` e `ItemPedido` validan el estado |
+| 7 | No facturar hasta que todos los ítems estén listos | `Pedido.facturarPedido` |
+| 8 | Calcular el precio total con combos | `Pedido.getPrecioTotal` y `Combo.getPrecio` |
+| 9 | Aplicar solo el descuento más beneficioso | `SelectorDeDescuento` |
+| 10 | Consultar el historial con lo cobrado | `GestorPedidos.getHistorial` / `consultarFactura` |
 
-Se exceptúan los contadores de bucles `i`, `j` y `k`.
+## Patrones de diseño
 
-| ❌ Incorrecto    | ✅ Correcto          |
-| --------------- | ------------------- |
-| `const n = 10;` | `const total = 10;` |
+| Patrón | Categoría | Dónde lo usamos |
+|---|---|---|
+| Factory Method | Creacional | Creación de pedidos según su modalidad |
+| Composite | Estructural | Productos individuales y combos |
+| Strategy | Comportamiento | Beneficio de los combos y descuentos del pedido |
+| Template Method | Comportamiento | Descuentos porcentuales |
+| Chain of Responsibility | Comportamiento | Reparto de ítems entre las estaciones |
 
-## Números mágicos
+### Factory Method (creacional)
 
-Los números "sueltos" dentro de una expresión deben reemplazarse por una constante con nombre (los índices de arreglo, como `arr[0]`, están permitidos).
+**Problema.** El enunciado pide que sea fácil sumar modalidades nuevas. Cada modalidad necesita datos distintos:
 
-| ❌ Incorrecto                       | ✅ Correcto                                                                 |
-| ---------------------------------- | -------------------------------------------------------------------------- |
-| `for (let i = 0; i < 10; i++) { }` | `const MAX_INTENTOS = 10;`<br>`for (let i = 0; i < MAX_INTENTOS; i++) { }` |
+- salón: la mesa;
+- retiro: el horario y el teléfono;
+- envío: la dirección.
 
-## Longitud máxima de un método (40 líneas)
+Sin el patrón, `GestorPedidos` necesitaría un `if` por modalidad.
 
-| ❌ Incorrecto                                                                                                     | ✅ Correcto                                                                                                         |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `public calcular(): number {`<br>`  // ... 45 líneas de código`<br>`  // todo mezclado en un solo método`<br>`}` | `public calcular(): number {`<br>`  const datos = this.obtenerDatos();`<br>`  return this.procesar(datos);`<br>`}` |
+**Participantes.**
 
-## Longitud máxima de línea (120 caracteres)
+| Rol | Clase |
+|---|---|
+| Creador | interfaz `FabricaPedido` |
+| Creadores concretos | `FabricaPedidoSalon`, `FabricaPedidoRetiro`, `FabricaPedidoEnvio` |
+| Producto | `Pedido` |
+| Productos concretos | `PedidoSalon`, `PedidoRetiro`, `PedidoEnvio` |
 
-| ❌ Incorrecto                                                                                                                 | ✅ Correcto                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `const mensaje = "un texto larguísimo que supera ampliamente los 120 caracteres permitidos en una sola línea de código...";` | `const mensaje =`<br>`  "un texto largo " +`<br>`  "separado en varias líneas.";` |
+**Diagrama.**
 
-## Llaves obligatorias en `if`/`else`/`for`/`while`
+```mermaid
+classDiagram
+    class FabricaPedido {
+        <<interface>>
+        +crearPedido(numero) Pedido
+    }
+    FabricaPedido <|.. FabricaPedidoSalon
+    FabricaPedido <|.. FabricaPedidoRetiro
+    FabricaPedido <|.. FabricaPedidoEnvio
+    Pedido <|-- PedidoSalon
+    Pedido <|-- PedidoRetiro
+    Pedido <|-- PedidoEnvio
+    FabricaPedidoSalon ..> PedidoSalon : crea
+    FabricaPedidoRetiro ..> PedidoRetiro : crea
+    FabricaPedidoEnvio ..> PedidoEnvio : crea
+    GestorPedidos ..> FabricaPedido : usa
+```
 
-| ❌ Incorrecto                       | ✅ Correcto                                         |
-| ---------------------------------- | -------------------------------------------------- |
-| `if (activo) console.log("Hola");` | `if (activo) {`<br>`  console.log("Hola");`<br>`}` |
+**Justificación.**
 
-## Espaciado en estructuras de control
+- **Ventaja:** el gestor numera y guarda los pedidos sin saber de qué modalidad son. Para agregar una modalidad alcanza con un pedido y una fábrica nuevos, sin tocar el gestor.
+- **Costo:** cada modalidad necesita dos clases.
 
-Espacio después de la palabra clave (`if`, `for`, `while`) y antes del `(`; sin espacios pegados a `(` o `)`; espacio antes de `{`.
+### Composite (estructural)
 
-| ❌ Incorrecto                                     | ✅ Correcto                                         |
-| ------------------------------------------------ | -------------------------------------------------- |
-| `if(activo){`<br>`  console.log("Hola");`<br>`}` | `if (activo) {`<br>`  console.log("Hola");`<br>`}` |
+**Problema.** Un pedido puede tener productos sueltos y combos, y los dos se tienen que poder agregar, quitar y cotizar de la misma forma.
 
-## Modificadores de acceso explícitos
+**Participantes.**
 
-Todo campo o método de una clase debe declarar `public`, `private` o `protected`.
+| Rol | Clase |
+|---|---|
+| Componente | interfaz `Producto` |
+| Hoja | `Item` |
+| Compuesto | `Combo` |
 
-| ❌ Incorrecto                                    | ✅ Correcto                                              |
-| ----------------------------------------------- | ------------------------------------------------------- |
-| `class Persona {`<br>`  nombre: string;`<br>`}` | `class Persona {`<br>`  private nombre: string;`<br>`}` |
+**Diagrama.**
 
-## Métodos que no usan `this`
+```mermaid
+classDiagram
+    class Producto {
+        <<interface>>
+        +getNombre() string
+        +getPrecio() number
+        +getItems() Item[]
+    }
+    Producto <|.. Item
+    Producto <|.. Combo
+    Combo o-- "2..*" Item
+    Pedido o-- "*" Producto
+```
 
-Si un método no usa `this`, probablemente debería ser `static`.
+**Justificación.**
 
-| ❌ Incorrecto                                                                                                                             | ✅ Correcto                                                                                                                                      |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `class Calculadora {`<br>`  public sumar(primero: number, segundo: number): number {`<br>`    return primero + segundo;`<br>`  }`<br>`}` | `class Calculadora {`<br>`  public static sumar(primero: number, segundo: number): number {`<br>`    return primero + segundo;`<br>`  }`<br>`}` |
+- **Ventaja:** `Pedido` calcula el precio y arma los ítems de cocina sin preguntar si cada producto es un combo.
+- **Limitación:** un combo agrupa ítems, no otros combos. El enunciado no lo pide.
 
-## Una sola clase por archivo
+### Strategy (comportamiento)
 
-| ❌ Incorrecto                                              | ✅ Correcto                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `// animal.ts`<br>`class Animal { }`<br>`class Perro { }` | `// animal.ts`<br>`class Animal { }`<br><br>`// perro.ts`<br>`class Perro { }` |
+**Problema.** Lo usamos en dos lugares:
 
-## Sin métodos o funciones vacías
+- **Combos:** el beneficio de un combo puede ser un porcentaje o un precio fijo, y el dueño quiere crear combos nuevos sin modificar el sistema.
+- **Descuentos del pedido:** hay varios, cada uno con su propia condición, y se aplica solo el mejor.
 
-| ❌ Incorrecto                    | ✅ Correcto                                                       |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `public constructor() {`<br>`}` | `public constructor() {`<br>`  this.inicializado = true;`<br>`}` |
+**Participantes.**
 
-## Tipo de retorno explícito
+| Rol | Combos | Descuentos |
+|---|---|---|
+| Estrategia | `Beneficio` | `Descuento` |
+| Estrategias concretas | `BeneficioPorPorcentaje`, `BeneficioPorPrecioFijo` | `DescuentoPorPagoEfectivo`, `DescuentoPorDiaDeSemana` |
+| Contexto | `Combo` | `SelectorDeDescuento` |
 
-| ❌ Incorrecto                                                 | ✅ Correcto                                                           |
-| ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| `public obtenerNombre() {`<br>`  return this.nombre;`<br>`}` | `public obtenerNombre(): string {`<br>`  return this.nombre;`<br>`}` |
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Beneficio {
+        <<interface>>
+        +calcularBeneficio(suma) number
+    }
+    Beneficio <|.. BeneficioPorPorcentaje
+    Beneficio <|.. BeneficioPorPrecioFijo
+    Combo o-- Beneficio
+
+    class Descuento {
+        <<interface>>
+        +calcularDescuento(pedido) number
+    }
+    Descuento <|.. DescuentoPorcentual
+    DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
+    DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+    SelectorDeDescuento o-- "*" Descuento
+```
+
+**Justificación.**
+
+- **Ventajas:**
+  - Cada forma de calcular está en su propia clase.
+  - Para un combo o un descuento nuevo alcanza con una clase más.
+  - El selector compara los montos sin saber qué descuento es cada uno.
+- **Costo:** hay más clases chicas. Además, ojo: `Beneficio` devuelve el precio final y `Descuento` devuelve el monto a restar.
+
+### Template Method (comportamiento)
+
+**Problema.** Los dos descuentos se calculan igual, como un porcentaje del total. Lo único que cambia es la condición:
+
+- `DescuentoPorPagoEfectivo`: que se pague en efectivo;
+- `DescuentoPorDiaDeSemana`: que sea el día indicado.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Clase abstracta | `DescuentoPorcentual`: `calcularDescuento` es el método plantilla |
+| Clases concretas | `DescuentoPorPagoEfectivo` y `DescuentoPorDiaDeSemana`, que implementan `aplica` |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class DescuentoPorcentual {
+        <<abstract>>
+        +calcularDescuento(pedido) number
+        #aplica(pedido)* boolean
+    }
+    DescuentoPorcentual <|-- DescuentoPorPagoEfectivo
+    DescuentoPorcentual <|-- DescuentoPorDiaDeSemana
+```
+
+**Justificación.**
+
+- **Ventaja:** la cuenta del porcentaje se escribe una sola vez.
+- **Limitación:** solo sirve para descuentos porcentuales.
+
+### Chain of Responsibility (comportamiento)
+
+**Problema.** El enunciado pide que agregar una estación nueva no obligue a reescribir las demás.
+
+**Participantes.**
+
+| Rol | Clase |
+|---|---|
+| Manejador | `Estacion` |
+| Manejadores concretos | `Parrilla`, `Barra`, `CocinaFria`, `CocinaDulce` |
+| Armado de la cadena | `CadenaEstaciones` |
+| Emisor | `GestorPedidos`, que solo conoce la primera estación |
+
+**Diagrama.**
+
+```mermaid
+classDiagram
+    class Estacion {
+        <<abstract>>
+        +recibir(item) void
+        +iniciarSiguiente() ItemPedido
+        +finalizar(item) void
+        #acepta(item) boolean
+    }
+    Estacion --> Estacion : siguiente
+    Estacion <|-- Parrilla
+    Estacion <|-- Barra
+    Estacion <|-- CocinaFria
+    Estacion <|-- CocinaDulce
+    CadenaEstaciones --> Estacion : arma
+    GestorPedidos --> Estacion : primeraEstacion
+```
+
+**Justificación.**
+
+- **Ventaja:** para sumar una estación alcanza con una subclase y una línea en `CadenaEstaciones`.
+- **Costo:** cada ítem recorre la cadena hasta encontrar su estación. Si ninguna lo acepta, se lanza `ErrorEstacionNoEncontrada`.
+
+## Diagramas
+
+En la carpeta `diagramas/`, en formato PlantUML:
+
+- [Diagrama de clases](diagramas/clasesTP.puml)
+- [Secuencia: deshacer la última modificación](diagramas/Secuencia/secuencia_deshacer.puml) (requerimiento 3)
+- [Secuencia: facturar con el mejor descuento](diagramas/Secuencia/secuencia_facturar.puml) (requerimientos 7 y 9)
+
+Para verlos en VS Code, instalá la extensión PlantUML y apretá `Alt + D` con el archivo abierto.

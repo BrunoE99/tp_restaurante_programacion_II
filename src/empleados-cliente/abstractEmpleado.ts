@@ -1,6 +1,5 @@
 import Cliente from "./cliente";
 import {Pedido} from "../pedido/pedido";
-import iMedioDePago from "../medios_de_pago/iMediosDePago";
 
 export default abstract class Empleado {
     private clientes: Cliente[];
@@ -26,8 +25,4 @@ export default abstract class Empleado {
     public getPedidos(): Pedido[] {
         return this.pedidos;
     }               
-
-    public cobrarPedido(cliente: Cliente, medioDePago: iMedioDePago): void {
-        cliente.pagarPedido(medioDePago);
-    }
 }
