@@ -8,7 +8,7 @@ import { DiaSemana } from "../src/enums/dia_semana";
 import { EstadoPedido } from "../src/enums/estado_pedido";
 import { BeneficioPorPorcentaje } from "../src/beneficio/BeneficioPorPorcentaje";
 import Efectivo from "../src/medios_de_pago/efectivo";
-import { ErrorPedidoSinAccionesParaDeshacer } from "../src/excepciones/pedido/error_pedido_sinAccionesParaDeshacer";
+import { ErrorPedidoSinAccionesParaDeshacer } from "../src/excepciones/pedido/error_pedido_sin_acciones_para_deshacer";
 import { ErrorPedidoSinProductos } from "../src/excepciones/pedido/error_pedido_sin_productos";
 import { ErrorPedidoEstadoIncorrecto } from "../src/excepciones/pedido/error_pedido_estado";
 import { ErrorPedidoItemsNoListos } from "../src/excepciones/pedido/error_pedido_items_no_listos";
